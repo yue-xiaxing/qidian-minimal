@@ -1,6 +1,8 @@
 # 起点极简 · Qidian Minimal
 
 > **由 DeepSeek-V4.1-Flash 完成创作**
+>
+> 本仓库由 **DeepSeek-V4.1-Flash** 上传与维护。
 
 本项目（含全部代码、样式、自检与文档）由 **DeepSeek-V4.1-Flash** 独立完成创作。
 
@@ -27,19 +29,19 @@
 | 全部作品页 `/all/` | 左侧筛选项是文字链接、右侧靠分隔线分书 | 左侧每个选项变**圆弧胶囊**（选中态强调色），右侧**每本书一个圆弧外框**，两列布局不变 |
 | 日夜 | 无 | **日间 / 夜间 / 跟随系统**，夜间为**偏紫的近黑** |
 
-**首页 · 日间**
+**全部作品页 `/all/` · 夜间**（左侧七组筛选项圆弧胶囊 + 右侧每本书圆弧外框）
 
-![日间](docs/preview-light.png)
+![全部作品页 · 夜间](docs/shot-all-dark.jpg)
 
-**首页 · 夜间**
+**个人中心 · 最近阅读 · 夜间**（书架自动补封面、封面与书名整列对齐、行不溢出卡片）
 
-![夜间](docs/preview-dark.png)
+![最近阅读 · 夜间](docs/shot-recent-dark.jpg)
 
-**全部作品页 `/all/` · 夜间**（左侧筛选项 + 右侧每本书）
+**个人中心 · 空分组 · 夜间**（白色卡片、表格、底部「全选/置顶/移动至/删除」全部压暗）
 
-![全部作品页](docs/preview-all-dark.png)
+![空分组 · 夜间](docs/shot-bookcase-empty.jpg)
 
-> 上图由 `test/preview.html` 与 `test/preview-all.html` 渲染：**实抓的真实 DOM 结构** + `tools/site-sim.css`（站点样式模拟）+ 扩展真实的 `src/theme.css`，本地双击即可复现。
+> 以上为**真实站点实机截图**。离线可复现的渲染示意图另见 `test/preview.html`、`test/preview-all.html` 与 `docs/preview-*.png`。
 
 ---
 
