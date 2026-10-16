@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>起点极简 · 负层级装饰层回归验证</title>
+    <link rel="stylesheet" href="../src/theme.css" />
+    <style>
+      /* 站点风格的最小复现：详情页首屏就是「浅色层放在 z-index:-9」这种结构 */
+      .book-detail { position: relative; height: 320px; }
+      .book-detail .gradient {
+        background-color: #f7f7fc;
+        bottom: 0;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: -9;
+      }
+      .book-detail .bg-left {
+        background: #ffe9c8;
+        border-radius: 50%;
+        filter: blur(60px);
+        height: 220px;
+        left: 90px;
+        position: absolute;
+        top: 40px;
+        width: 220px;
+        z-index: -10;
+      }
+      .book-detail .book-author {
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 10px;
+        margin: 24px 0 0 24px;
+        padding: 24px 32px;
+        width: 420px;
+      }
+      .book-detail-mid { background-color: #f7f7fc; height: 160px; padding-top: 32px; }
+      .probe { font: 600 13px/1.6 monospace; padding: 8px 24px; }
+    </style>
+    <script>
+      // 模拟「旧写法」：给 html 设背景。修复前的 theme.css 就是这么写的。
+      (function () {
+        var p = new URLSearchParams(location.search);
+        var theme = p.get('theme') === 'dark' ? 'dark' : 'light';
+        var r = document.documentElement;
+        r.setAttribute('data-qd-minimal', 'on');
+        r.setAttribute('data-qd-theme', theme);
+        if (p.get('old') === '1') {
+          var s = document.createElement('style');
+          s.textContent = 'html{background:' + (theme === 'dark' ? '#0b0910' : '#f4f5f7') + ' !important}';
+          document.head.appendChild(s);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="book-detail">
+      <div class="gradient"></div>
+      <div class="bg-left"></div>
+      <div class="book-author">详情页首屏玻璃卡（站点靠负层级层提供浅色底）</div>
+    </div>
+    <div class="book-detail-mid">详情页正文区（自带 #f7f7fc 浅底）</div>
+    <div class="probe" id="probe">probe</div>
+    <script>
+      (function () {
+        var p = new URLSearchParams(location.search);
+        var r = document.documentElement;
+        var cs = getComputedStyle(r);
+        document.getElementById('probe').textContent =
+          'html背景=' + cs.backgroundColor + ' | body背景=' + getComputedStyle(document.body).backgroundColor;
+      })();
+    </script>
+  </body>
+</html>

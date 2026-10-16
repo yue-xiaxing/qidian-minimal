@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>起点极简 · 计算样式自检（真实结构）</title>
+
+    <!-- 站点样式模拟（相当于站点自己的 CSS，顺序在前） -->
+    <link rel="stylesheet" href="site-sim.css" />
+
+    <!-- 被测样式表（相当于 document_end 注入，顺序在后） -->
+    <link rel="stylesheet" href="../src/theme.css" />
+
+    <script>
+      // 等价于 early.js 在 document_start 的行为
+      (function () {
+        var theme = new URLSearchParams(location.search).get('theme') === 'dark' ? 'dark' : 'light';
+        var r = document.documentElement;
+        r.setAttribute('data-qd-minimal', 'on');
+        r.setAttribute('data-qd-home', '1'); // 本页模拟首页（品牌行整行铺满规则只在首页生效）
+        r.setAttribute('data-qd-theme', theme);
+        // 夜间限定规则都挂在 data-qd-resolved 上，必须同步设置，否则那些规则在自检里从未被验证
+        r.setAttribute('data-qd-resolved', theme);
+        r.setAttribute('data-qd-nogames', 'on');
+        // data-qd-noads 故意不设：验证「隐藏推广位默认关闭」
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <!-- ============ 顶部工具条 ============ -->
+      <div class="top-nav">
+        <div class="box-center cf">
+          <div class="nav-link fl">
+            <a class="act" href="/">起点中文网</a>
+            <a class="third-remove" href="//www.qdmm.com/">起点女生网</a>
+            <em>|</em>
+            <a id="switchEl" href="javascript:">繁体版</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 顶部随机广告（页游入口，真实页面上 JS 会把它显示出来） ============ -->
+      <div class="top-op-box" id="j-topOpBox">
+        <div class="top-game-op" id="topGameOp" style="display: block">
+          <div class="game-wrap">
+            <a class="close" id="closeTopGame" href="javascript:"><em class="iconfont">×</em></a>
+            <a href="https://game.qidian.com/CpGameHome/Ad/directLogin?x" target="_blank">
+              <img alt="game" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+              <span class="op-tag">页游</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 品牌行 + 搜索 ============ -->
+      <div class="logo-wrap box-center">
+        <div class="box-center cf">
+          <div class="book-shelf fr"><a id="numero2" href="/bookcase"><em class="iconfont shelf">▤</em><i>我的书架</i></a></div>
+          <div class="logo fl"><a href="/" aria-label="起点中文网"></a></div>
+          <div class="search-wrap fl">
+            <form id="formUrl">
+              <p><input id="s-box" class="search-box" type="text" placeholder="搜索书名 / 作者" /></p>
+              <input id="searchSubmit" class="submit-input" type="submit" value="搜索" />
+              <a href="javascript:"><label id="search-btn" class="search-btn"><em class="iconfont">Q</em></label></a>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 主导航（站点原本是 #3e3d43 深灰底白字） ============ -->
+      <div class="main-nav-wrap">
+        <div class="main-nav box-center cf">
+          <ul>
+            <li class="first">
+              <span><em><i></i><i></i><i></i></em>作品分类<b><strong></strong></b></span>
+            </li>
+            <li class="nav-li"><a href="/all/">全部作品</a></li>
+            <li class="nav-li"><a class="act" href="/rank/">排行</a></li>
+            <li class="nav-li"><a href="/free/">免费</a></li>
+            <li class="nav-li"><a href="/finish/">完本</a></li>
+            <!-- 页游入口（导航里） -->
+            <li class="game web" id="game-web">
+              <a class="web-game" href="https://game.qidian.com?qd_game_key=qdzw_homepage_Topbar" rel="nofollow">
+                <b class="iconfont">G</b>页游
+              </a>
+              <div class="game-dropdown hidden" id="web-dropdown">
+                <cite></cite>
+                <div class="web-game-list"><dl class="web-list"><dt>网页游戏</dt><dd class="act"><h3><a href="#">某某页游</a></h3></dd></dl></div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ============ 首页书单三栏（216px 紧凑文字榜：绝不能变网格） ============ -->
+      <div class="index-two-wrap box-center mb40 cf">
+        <div class="book-list-wrap mr30 fl">
+          <h3 class="wrap-title lang">热门推荐<a class="more" href="#"><em class="iconfont">›</em></a></h3>
+          <div class="book-list">
+            <ul>
+              <li class="color-type_1">
+                <a class="channel" href="#"><em>[仙侠]</em></a>
+                <strong><a class="name" href="#">凡人修仙传</a><cite class="hot"></cite></strong>
+                <a class="author" href="#">忘语</a>
+              </li>
+              <li>
+                <a class="channel" href="#"><em>[奇幻]</em></a>
+                <strong><a class="name" href="#">诡秘之主</a></strong>
+                <a class="author" href="#">爱潜水的乌贼</a>
+              </li>
+              <li>
+                <a class="channel" href="#"><em>[仙侠]</em></a>
+                <strong><a class="name" href="#">大奉打更人</a></strong>
+                <a class="author" href="#">卖报小郎君</a>
+              </li>
+              <li>
+                <a class="channel" href="#"><em>[历史]</em></a>
+                <strong><a class="name" href="#">穷鬼的上下两千年</a></strong>
+                <a class="author" href="#">非玩家角色</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="banner-two" class="banner-wrap box-center mb30"><a href="#"><img alt="ad" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" /></a></div>
+
+        <!-- ============ 作品分类面板（站点写死米色底）+ 公共组件 + 灰按钮 ============ -->
+        <div class="classify-list fl" id="classify-list">
+          <dl class="cf">
+            <dd class="left"><a href="#"><cite><span class="info">玄幻</span></cite></a></dd>
+            <dd class="even"><a href="#"><cite><span class="info">奇幻</span></cite></a></dd>
+          </dl>
+        </div>
+        <div class="lbf-popup lbf-combobox-panel" id="lbf-panel">
+          <ul class="lbf-combobox-options"><li class="lbf-combobox-item">玄幻</li></ul>
+        </div>
+        <a class="grey-btn" id="grey-btn" href="#">灰按钮</a>
+
+        <!-- ============ 榜单 ============ -->
+        <div class="rank-wrap box-center mb20">
+          <div id="numero3">
+            <div class="rank-list">
+              <div class="book-list">
+                <ul>
+                  <li>
+                    <div class="num-box"><span class="num1">1</span></div>
+                    <div class="name-box"><a class="name" href="#">凡人修仙传</a><i class="total">1234</i></div>
+                  </li>
+                  <li>
+                    <div class="num-box"><span class="num2">2</span></div>
+                    <div class="name-box"><a class="name" href="#">诡秘之主</a><i class="total">1102</i></div>
+                  </li>
+                  <li>
+                    <div class="num-box"><span class="num3">3</span></div>
+                    <div class="name-box"><a class="name" href="#">大奉打更人</a><i class="total">980</i></div>
+                  </li>
+                  <li>
+                    <div class="num-box"><span>4</span></div>
+                    <div class="name-box"><a class="name" href="#">深空彼岸</a><i class="total">901</i></div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <!-- ============ 带封面的书卡 / 限时免费 / 编辑推荐（真实结构） ============ -->
+        <div class="book-wrap" id="book-wrap">
+          <div class="book-cover">
+            <a href="#"><img alt="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" /></a>
+          </div>
+          <div class="book-info">
+            <h3>完本</h3>
+            <h2><a class="book-name" href="#">凡人修仙传</a></h2>
+            <p class="author"><a class="writer" href="#">忘语</a></p>
+            <p class="digital"><em>9.8</em>分</p>
+            <p class="desc">一个普通山村小子的修仙路</p>
+            <a class="tag" href="#">仙侠</a>
+          </div>
+        </div>
+
+        <div class="time-limit-wrap">
+          <ul>
+            <li class="time-box odd" id="time-box">
+              <a class="book-img" href="#"><img alt="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" /></a>
+              <a class="name" href="#">限时免费书</a>
+              <a class="free-blue-btn" href="#" id="free-btn">免费阅读</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="edit-rec-wrap">
+          <ul class="edit-rec-list" id="edit-rec-list">
+            <li>
+              <h3><a href="#">编辑推荐书</a></h3>
+              <em><cite>9.2</cite><i>分</i></em>
+              <p>简介简介简介简介简介简介简介简介</p>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ============ 全部作品页（/all/）：左侧筛选项 + 右侧每本书 ============ -->
+        <div class="all-pro-wrap cf">
+          <div class="range-sidebar fl">
+            <div class="site">
+              <a class="site-item act" href="#">男生</a>
+              <a class="site-item" href="#">女生</a>
+              <a class="site-item" href="#">出版</a>
+              <a class="site-item" href="#">听书</a>
+            </div>
+            <div class="selected" id="selected-bar">
+              <a class="all" href="#">全部<cite>×</cite></a>
+              <a href="#">玄幻<cite>×</cite></a>
+            </div>
+            <div class="select-list">
+              <div class="work-filter type-filter" id="work-filter">
+                <h3>分类</h3>
+                <ul class="row-1">
+                  <li class="act arrow"><a href="#">全部</a><cite></cite></li>
+                  <li><a href="#">玄幻</a></li>
+                  <li><a href="#">奇幻</a></li>
+                  <li><a href="#">武侠</a></li>
+                </ul>
+              </div>
+              <div class="sub-type" id="sub-type">
+                <dl><dd class="act"><a href="#">东方玄幻</a></dd><dd><a href="#">修真文明</a></dd></dl>
+              </div>
+            </div>
+          </div>
+
+          <div class="main-content-wrap fl">
+            <div class="tool-bar cf">
+              <div class="select-wrap">
+                <a class="act" href="#" id="sort-act">人气排序<cite class="iconfont">↓</cite></a>
+                <a href="#" id="sort-plain">总收藏</a>
+              </div>
+              <div class="sort-count count-info"><div class="count-text">共 <span>1097614</span> 本相关作品</div></div>
+            </div>
+
+            <div class="all-book-list">
+              <div class="book-img-text">
+                <ul class="all-img-list cf">
+                  <li id="all-book-1">
+                    <div class="book-img-box">
+                      <a href="#"><img alt="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" /></a>
+                    </div>
+                    <div class="book-mid-info">
+                      <h2><a href="#"><cite class="red-kw">夜</cite>无疆</a></h2>
+                      <p class="author"><a class="name" href="#">辰东</a><i>·</i><span>玄幻 · 东方玄幻 · 连载</span></p>
+                      <p class="intro">那一天太阳落下再也没有升起………………</p>
+                      <p class="update">415.98万字 <i>|</i> <a href="#">第846章 大可不必</a></p>
+                    </div>
+                  </li>
+                  <li id="all-book-2">
+                    <div class="book-img-box">
+                      <a href="#"><img alt="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" /></a>
+                    </div>
+                    <div class="book-mid-info">
+                      <h2><a href="#">玄鉴仙族</a></h2>
+                      <p class="author"><a class="name" href="#">季越人</a><i>·</i><span>仙侠 · 修真文明 · 连载</span></p>
+                      <p class="intro">陆江仙熬夜猝死，残魂却附在了一面满是裂痕的青灰色铜镜上。</p>
+                      <p class="update">641.63万字 <i>|</i> <a href="#">第一千六百二十七章 推演</a></p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <!-- ============ 筛选搜索条 ============ -->
+      <div class="filter-search-wrap">
+        <div class="box-center cf">
+          <div class="filter-search-box cf">
+            <span class="title">作品分类</span>
+            <div class="filter-search"><a class="red-btn" href="javascript:">搜索</a></div>
+          </div>
+          <div class="everyone">
+            <span class="title">热搜</span>
+            <div class="key-words"><a href="#">凡人</a></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 未知页面降级层：表格 ============ -->
+      <div class="box-center">
+        <table id="fallback-table">
+          <thead>
+            <tr><th>书名</th><th>更新时间</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>凡人修仙传</td><td>2026-10-16</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+        <!-- ============ 页脚上方：分页 + 本周热推 ============ -->
+        <div class="page-box cf">
+          <div class="pagination fr">
+            <div class="lbf-pagination">
+              <ul class="lbf-pagination-item-list">
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-prev lbf-pagination-disabled">&lt;</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-page lbf-pagination-current" id="page-cur">1</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-page" id="page-2">2</a></li>
+              </ul>
+              <div class="lbf-pagination-jump">
+                <input class="lbf-pagination-input" type="text" />
+                <a href="#" class="lbf-pagination-go" id="page-go">确定</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="weekly-hot-rec">
+          <div class="box-center cf">
+            <span class="title">本周热推:</span>
+            <div class="book-name-container">
+              <a class="book-item" id="hot-item" href="#">尘骨小说</a>
+              <a class="book-item" href="#">我的功法无限提升最新章节</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ 书籍详情页首屏：负层级装饰层（用来验证 html 不能被设背景） ============ -->
+        <div class="nav-wrap" id="nav-wrap">
+          <div class="left-items"><div class="qidian-logo">起点</div><div class="catalog-a">全部作品</div><div class="catalog-b">排行</div></div>
+          <div class="right-items"><a href="#">登录</a><div class="my-bookshelf">我的书架</div></div>
+        </div>
+        <div class="book-detail" id="book-detail">
+          <div class="gradient" id="detail-gradient"></div>
+          <div class="book-author" id="book-author">详情页首屏玻璃卡</div>
+        </div>
+        <div class="book-detail-mid" id="detail-mid">详情页正文区（自带 #f7f7fc 浅底）</div>
+
+        <!-- ============ 作用域探针：夜间专属规则绝不能在日间生效 ============ -->
+        <div id="day-probe" data-qd-light="1" style="background-color: #fff; color: #333; padding: 10px">自适应探针（站点原本是白底深字）</div>
+        <table><tbody>
+          <tr id="day-probe-sel" data-qd-sel="1" style="background-color: #fdf6e3">
+            <td style="background-color: #fdf6e3; color: #333">选中探针（站点原本是浅黄高亮）</td>
+          </tr>
+        </tbody></table>
+        <div class="book-copyright" id="right-card" style="background-color: #fff"><div class="work-title"><h3>版权改编</h3></div><div class="copyright-txt">本作品相关版权可售</div></div>
+        <a class="act" id="left-act" href="#" style="background-color: #fff"><span class="left-text">作品信息</span></a>
+        <div class="book-detail">
+          <div class="gradient" id="detail-hero-gradient"></div>
+          <div class="book-info"><h1 id="detail-hero-title" style="color: #191919">夜无疆</h1></div>
+        </div>
+
+        <!-- ============ 首页排行榜（真实结构：榜首是整卡，其余是单行） ============ -->
+        <div class="rank-wrap box-center mb20">
+        <div class="rank-list-row cf mb20" id="rank-row">
+          <div class="rank-list" id="rank-col">
+            <h3 class="wrap-title lang"><a href="#">月票榜<i>·</i>VIP新作</a></h3>
+            <div class="book-list">
+              <ul>
+                <li class="unfold" id="rank-first">
+                  <div class="book-wrap cf">
+                    <div class="book-info fl">
+                      <h3>NO.1</h3>
+                      <h2><a class="book-name" href="#">神宠供应商</a></h2>
+                      <p class="digital"><em>34835</em>月票</p>
+                      <p class="author"><a class="type" href="#">轻小说</a><i>·</i><a class="writer" href="#">轻泉流响</a></p>
+                    </div>
+                    <div class="book-cover">
+                      <a class="link" href="#"><img alt="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" /></a>
+                    </div>
+                  </div>
+                </li>
+                <li id="rank-second">
+                  <div class="num-box"><span class="num2">2</span></div>
+                  <div class="name-box"><a class="name" href="#"><h2>夜夜行歌</h2></a><i class="total">19594</i></div>
+                </li>
+                <li id="rank-third">
+                  <div class="num-box"><span class="num3">3</span></div>
+                  <div class="name-box"><a class="name" href="#"><h2>光阴之外</h2></a><i class="total">18220</i></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="rank-list" id="rank-col-2">
+            <h3 class="wrap-title lang"><a href="#">追读榜</a></h3>
+            <div class="book-list">
+              <ul>
+                <li>
+                  <div class="num-box"><span class="num1">1</span></div>
+                  <div class="name-box"><a class="name" href="#"><h2>某书</h2></a><i class="total">100</i></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <!-- ============ 页脚 ============ -->
+      <div class="footer">
+        <div class="box-center cf">
+          <div class="footer-menu"><a href="#">关于我们</a><a href="#">联系方式</a></div>
+          <div class="copy-right"><p><a href="#">隐私政策</a> © 起点中文网</p></div>
+        </div>
+      </div>
+
+      <!-- ============ 右下固定条 ============ -->
+      <div class="page-bottom-fixed" id="pageBottmOprate">
+        <div class="page-bottom-item">
+          <a id="bookShelf" class="item-link-txt" href="/bookcase"><em class="iconfont icon-shelf">▤</em><span class="txt">我的书架</span></a>
+        </div>
+      </div>
+    </div>
+
+    <pre id="report"></pre>
+
+    <script>
+      (function () {
+        var theme = new URLSearchParams(location.search).get('theme') === 'dark' ? 'dark' : 'light';
+        var LIGHT = {
+          bg: 'rgb(244, 245, 247)',
+          rawBg: '#f4f5f7',
+          surface: 'rgb(255, 255, 255)',
+          surface2: 'rgb(247, 248, 250)',
+          surface3: 'rgb(238, 240, 244)',
+          border: 'rgb(228, 231, 236)',
+          text: 'rgb(21, 23, 28)',
+          text2: 'rgb(75, 82, 97)',
+          text3: 'rgb(138, 146, 161)',
+          accent: 'rgb(224, 62, 82)',
+          accentSoft: 'rgba(224, 62, 82, 0.1)',
+          accentLine: 'rgba(224, 62, 82, 0.34)'
+        };
+        var DARK = {
+          // 用户指定：框内 #171C20 / 框线 #303539 / 字 #BEC8D2
+          bg: 'rgb(11, 9, 16)',
+          rawBg: '#0b0910',
+          surface: 'rgb(23, 28, 32)',
+          surface2: 'rgb(27, 33, 38)',
+          surface3: 'rgb(33, 40, 46)',
+          border: 'rgb(48, 53, 57)',
+          text: 'rgb(190, 200, 210)',
+          text2: 'rgb(163, 174, 187)',
+          text3: 'rgb(124, 136, 148)',
+          accent: 'rgb(255, 90, 118)',
+          accentSoft: 'rgba(255, 90, 118, 0.15)',
+          accentLine: 'rgba(255, 90, 118, 0.44)'
+        };
+        var T = theme === 'dark' ? DARK : LIGHT;
+
+        var out = [];
+        var pass = 0;
+        var fail = 0;
+
+        function st(sel, prop, pseudo) {
+          var el = document.querySelector(sel);
+          if (!el) return '__MISSING__';
+          return getComputedStyle(el, pseudo || null)[prop];
+        }
+        function check(name, sel, prop, expected, pseudo) {
+          var actual = st(sel, prop, pseudo);
+          var ok = Array.isArray(expected) ? expected.indexOf(actual) !== -1 : actual === expected;
+          if (ok) {
+            pass++;
+            out.push('AUDIT PASS | ' + name + ' | ' + prop + ' = ' + actual);
+          } else {
+            fail++;
+            out.push('AUDIT FAIL | ' + name + ' | ' + prop + ' = ' + actual + ' | 期望 ' +
+              (Array.isArray(expected) ? expected.join(' 或 ') : expected));
+          }
+        }
+        function checkFn(name, fn, expected) {
+          var actual;
+          try {
+            actual = fn();
+          } catch (e) {
+            actual = '__ERR__:' + e.message;
+          }
+          var ok = Array.isArray(expected) ? expected.indexOf(actual) !== -1 : actual === expected;
+          if (ok) {
+            pass++;
+            out.push('AUDIT PASS | ' + name + ' | ' + actual);
+          } else {
+            fail++;
+            out.push('AUDIT FAIL | ' + name + ' | ' + actual + ' | 期望 ' +
+              (Array.isArray(expected) ? expected.join(' 或 ') : expected));
+          }
+        }
+
+        out.push('AUDIT THEME = ' + theme);
+
+        /* ---- 1. 令牌是否真的作用在 html 上 ---- */
+        checkFn('基础令牌块生效（--qd-r-lg）', function () {
+          return getComputedStyle(document.documentElement).getPropertyValue('--qd-r-lg').trim();
+        }, ['14px']);
+        checkFn('基础令牌块生效（--qd-bg）', function () {
+          return getComputedStyle(document.documentElement).getPropertyValue('--qd-bg').trim();
+        }, [T.rawBg]);
+        checkFn('color-scheme 已声明', function () {
+          return getComputedStyle(document.documentElement).colorScheme;
+        }, [theme]);
+        checkFn('accent-color 已下发到原生控件', function () {
+          return getComputedStyle(document.documentElement).accentColor;
+        }, [T.accent]);
+        check('页面底色', 'body', 'backgroundColor', T.bg);
+        check('正文字色', 'body', 'color', T.text);
+
+        /* ---- 2. 顶部工具条 ---- */
+        check('工具条底色', '.top-nav', 'backgroundColor', T.surface);
+        check('工具条发丝线', '.top-nav', 'borderBottomWidth', '1px');
+        check('工具条次要字色', '.top-nav a.third-remove', 'color', T.text3);
+        check('当前站点字色', '.top-nav a.act', 'color', T.text);
+        check('当前站点去掉了白底盒', '.top-nav a.act', 'backgroundColor', 'rgba(0, 0, 0, 0)');
+        check('当前站点去掉了左右描边', '.top-nav a.act', 'borderLeftWidth', '0px');
+        check('当前站点强调线', '.top-nav a.act', 'backgroundColor', T.accent, '::after');
+
+        /* ---- 3. 页游入口（含 inline style="display:block" 的顶部广告条） ---- */
+        check('顶部页游广告容器被整体隐藏', '#j-topOpBox', 'display', 'none');
+        check('顶部页游广告条被整体隐藏', '#topGameOp', 'display', 'none');
+        check('导航里的页游入口被隐藏', '#game-web', 'display', 'none');
+        check('页游下拉面板被隐藏', '#web-dropdown', 'display', 'none');
+
+        /* ---- 4. 品牌行与搜索 ---- */
+        /* 品牌行：真实页面这一行同时带 .box-center（1200px），
+           直接设背景色会在左右两侧露出页面底色 → 必须走「全出血」写法 */
+        checkFn('品牌行底色全出血（盒内 + 盒外都要铺到）', function () {
+          var s = getComputedStyle(document.querySelector('.logo-wrap'));
+          return (
+            (s.backgroundColor === T.surface ? 'bg-ok' : 'bg-miss:' + s.backgroundColor) +
+            '/' +
+            (s.boxShadow.indexOf(T.surface) !== -1 ? 'shadow-ok' : 'shadow-miss') +
+            '/' +
+            (/^inset\(/.test(s.clipPath) ? 'clip-ok' : 'clip-miss')
+          );
+        }, ['bg-ok/shadow-ok/clip-ok']);
+        checkFn('品牌行底部发丝线整行铺开', function () {
+          return getComputedStyle(document.querySelector('.logo-wrap'), '::after').backgroundColor;
+        }, [T.border]);
+        checkFn('品牌行有效宽度仍是 1200px（未改动站点布局）', function () {
+          return Math.round(document.querySelector('.logo-wrap').getBoundingClientRect().width) + 'px';
+        }, ['1200px']);
+        check('搜索框底色', '.logo-wrap .search-wrap p', 'backgroundColor', T.surface2);
+        check('搜索框描边', '.logo-wrap .search-wrap p', 'borderTopColor', T.border);
+        check('搜索框左侧圆角', '.logo-wrap .search-wrap p', 'borderTopLeftRadius', '12px');
+        check('输入框自身无描边（保持拼合结构）', '.logo-wrap .search-wrap .search-box', 'borderTopWidth', '0px');
+        check('搜索按钮底框', '.logo-wrap .search-wrap .search-btn', 'backgroundColor', T.surface);
+        check('搜索按钮框线', '.logo-wrap .search-wrap .search-btn', 'borderTopColor', T.border);
+        check('搜索按钮圆弧外框', '.logo-wrap .search-wrap .search-btn', 'borderTopRightRadius', '12px');
+        check('我的书架按钮描边', '.logo-wrap .book-shelf a', 'borderTopColor', T.border);
+        check('我的书架按钮字色', '.logo-wrap .book-shelf a', 'color', T.text);
+        check('我的书架按钮圆弧外框', '.logo-wrap .book-shelf a', 'borderTopLeftRadius', '12px');
+
+        /* ---- 5. 主导航：深灰底白字 → 浅色底深字（本次修复的核心） ---- */
+        check('主导航底色变浅', '.main-nav-wrap .main-nav', 'backgroundColor', T.surface);
+        check('主导航不再继承 #3e3d43', '.main-nav-wrap', 'backgroundColor', T.surface);
+        check('导航链接字色可见', '.main-nav-wrap .main-nav li a', 'color', T.text2);
+        check('导航链接内边距收紧', '.main-nav-wrap .main-nav li a', 'padding', '0px 22px');
+        check('导航链接无底部旧描边', '.main-nav-wrap .main-nav li a', 'borderBottomColor', 'rgba(0, 0, 0, 0)');
+        check('当前导航项用强调色', '.main-nav-wrap .main-nav li.nav-li a.act', 'color', T.accent);
+        check('当前导航项底色', '.main-nav-wrap .main-nav li.nav-li a.act', 'backgroundColor', T.accentSoft);
+        check('作品分类块变浅', '.main-nav-wrap .main-nav li.first span', 'backgroundColor', 'rgba(0, 0, 0, 0)');
+        check('作品分类文字可见', '.main-nav-wrap .main-nav li.first span', 'color', T.text);
+        check('汉堡线条跟随文字色', '.main-nav-wrap .main-nav li.first span em i', 'backgroundColor', T.text3);
+
+        /* ---- 6. 书单三栏：保持紧凑，但每本书要有圆弧外框 ---- */
+        check('书单容器宽度未被改动', '.book-list-wrap', 'width', '216px');
+        check('书单不是网格布局', '.book-list-wrap .book-list ul', 'display', 'block');
+        check('书单行改为 flex（加框后不会换行）', '.book-list-wrap .book-list li', 'display', 'flex');
+        check('书单行高按 568px/18 行反推', '.book-list-wrap .book-list li', 'height', '29px');
+        check('书单行间距', '.book-list-wrap .book-list li', 'marginBottom', '2px');
+        check('书单行圆弧外框', '.book-list-wrap .book-list li', 'borderTopLeftRadius', '12px');
+        check('书单行框内颜色', '.book-list-wrap .book-list li', 'backgroundColor', T.surface);
+        check('书单行纤细框线', '.book-list-wrap .book-list li', 'borderTopColor', T.border);
+        check('书单行框线宽度', '.book-list-wrap .book-list li', 'borderTopWidth', '1px');
+        check('书单行文字色', '.book-list-wrap .book-list li:nth-child(2) a.name', 'color', T.text);
+        check('分类字色', '.book-list-wrap .book-list li:nth-child(2) a.channel', 'color', T.text3);
+        check('作者字色', '.book-list-wrap .book-list li:nth-child(2) .author', 'color', T.text3);
+        check('推荐位（color-type_1）保留强调色', '.book-list-wrap .book-list li.color-type_1 a.name', 'color', T.accent);
+
+        /* ---- 7. 区块标题 ---- */
+        check('标题字色', 'h3.wrap-title', 'color', T.text);
+        check('标题字重', 'h3.wrap-title', 'fontWeight', '600');
+        check('标题旧黑色分隔线换成发丝线', 'h3.wrap-title', 'borderBottomColor', T.border);
+        check('标题预留竖条内边距', '.book-list-wrap h3.wrap-title', 'paddingLeft', '12px');
+        checkFn('标题左侧几何竖条', function () {
+          var s = getComputedStyle(document.querySelector('.book-list-wrap h3.wrap-title'), '::before');
+          return s.width + '/' + s.backgroundColor;
+        }, ['3px/' + T.accent]);
+
+        /* ---- 8. 榜单：每本书也要有圆弧外框 ---- */
+        check('榜首数字块用强调色', '.rank-list .book-list li .num-box span.num1', 'backgroundColor', T.accent);
+        check('榜首数字块字色', '.rank-list .book-list li .num-box span.num1', 'color', 'rgb(255, 255, 255)');
+        check('第二名数字块用弱强调色', '.rank-list .book-list li .num-box span.num2', 'backgroundColor', T.accentSoft);
+        check('第四名数字块用中性底色', '.rank-list .book-list li .num-box span:not([class])', 'backgroundColor', T.surface3);
+        check('数字块几何圆角', '.rank-list .book-list li .num-box span', 'borderTopLeftRadius', '4px');
+        check('榜单行圆弧外框', '.rank-list .book-list li', 'borderTopLeftRadius', '12px');
+        check('榜单行框内颜色', '.rank-list .book-list li', 'backgroundColor', T.surface);
+        check('榜单行纤细框线', '.rank-list .book-list li', 'borderTopColor', T.border);
+        check('榜单行内部旧分隔线已去掉', '.rank-list .book-list li .name-box', 'borderTopColor', 'rgba(0, 0, 0, 0)');
+        check('榜单书名字色', '.rank-list .book-list li .name-box a.name', 'color', T.text);
+
+        /* ---- 9. 筛选搜索条 / 页脚 / 右下固定条 ---- */
+        check('筛选条底色', '.filter-search-wrap', 'backgroundColor', T.surface2);
+        check('筛选条上发丝线', '.filter-search-wrap', 'borderTopWidth', '1px');
+        check('筛选按钮底框', '.filter-search-wrap .red-btn', 'backgroundColor', T.surface);
+        check('筛选按钮无渐变', '.filter-search-wrap .red-btn', 'backgroundImage', 'none');
+        check('筛选按钮圆弧外框', '.filter-search-wrap .red-btn', 'borderTopLeftRadius', '12px');
+        check('筛选按钮框线', '.filter-search-wrap .red-btn', 'borderTopColor', T.border);
+        check('筛选按钮字色', '.filter-search-wrap .red-btn', 'color', T.text);
+        check('页脚底色', '.footer', 'backgroundColor', T.surface);
+        check('页脚链接字色', '.footer .footer-menu a', 'color', T.text3);
+        check('右下固定条卡片底色', '.page-bottom-fixed .page-bottom-item', 'backgroundColor', T.surface);
+        check('右下固定条发丝线', '.page-bottom-fixed .page-bottom-item', 'borderTopColor', T.border);
+
+        /* ---- 10. 未知页面降级层（书架 / 目录等表格模板） ---- */
+        check('表格发丝线', '#fallback-table td', 'borderTopColor', T.border);
+
+        /* ---- 11. 站点写死浅色底的兜底（夜间最扎眼的白块） ---- */
+        check('我的书架容器不再是白块', '.logo-wrap .book-shelf', 'backgroundColor', 'rgba(0, 0, 0, 0)');
+        check('作品分类面板底色', '.classify-list dd', 'backgroundColor', T.surface2);
+        check('作品分类面板偶数行底色', '.classify-list dd.even', 'backgroundColor', T.surface);
+        check('作品分类文字色', '.classify-list dd .info', 'color', T.text2);
+        check('lbf 面板底色', '#lbf-panel', 'backgroundColor', T.surface);
+        check('lbf 面板描边', '#lbf-panel', 'borderTopColor', T.border);
+        check('lbf 条目字色', '#lbf-panel .lbf-combobox-item', 'color', T.text2);
+        check('灰按钮底色', '#grey-btn', 'backgroundColor', T.surface);
+        check('灰按钮字色', '#grey-btn', 'color', T.text);
+        check('灰按钮圆弧外框', '#grey-btn', 'borderTopLeftRadius', '12px');
+        check('灰按钮框线', '#grey-btn', 'borderTopColor', T.border);
+
+        /* ---- 11. 推广位默认关闭 ---- */
+        check('默认不隐藏推广位', '#banner-two', 'display', 'block');
+        checkFn('打开开关后推广位被隐藏', function () {
+          var r = document.documentElement;
+          r.setAttribute('data-qd-noads', 'on');
+          var v = getComputedStyle(document.getElementById('banner-two')).display;
+          r.removeAttribute('data-qd-noads');
+          return v;
+        }, ['none']);
+
+        /* ---- 12. 圆弧外框：带框书的卡 / 限时免费 / 编辑推荐 ---- */
+        check('书卡圆弧外框', '#book-wrap', 'borderTopLeftRadius', '12px');
+        check('书卡框内颜色', '#book-wrap', 'backgroundColor', T.surface);
+        check('书卡框线', '#book-wrap', 'borderTopColor', T.border);
+        check('书卡内侧留白', '#book-wrap', 'paddingLeft', '10px');
+        check('封面圆角', '#book-wrap .book-cover img', 'borderTopLeftRadius', '10px');
+        check('封面框线', '#book-wrap .book-cover img', 'borderTopColor', T.border);
+        check('书卡书名色', '#book-wrap .book-info h2 .book-name', 'color', T.text);
+        check('书卡作者色', '#book-wrap .book-info p.author a', 'color', T.text3);
+        check('限时免费卡圆弧外框', '#time-box', 'borderTopLeftRadius', '12px');
+        check('限时免费卡框内颜色', '#time-box', 'backgroundColor', T.surface);
+        check('限时免费卡框线', '#time-box', 'borderTopColor', T.border);
+        check('免费阅读按钮圆弧外框', '#free-btn', 'borderTopLeftRadius', '12px');
+        check('免费阅读按钮框内颜色', '#free-btn', 'backgroundColor', T.surface);
+        check('免费阅读按钮框线', '#free-btn', 'borderTopColor', T.border);
+        check('免费阅读按钮字色', '#free-btn', 'color', T.text);
+        check('编辑推荐卡圆弧外框', '#edit-rec-list li', 'borderTopLeftRadius', '12px');
+        check('编辑推荐卡框内颜色', '#edit-rec-list li', 'backgroundColor', T.surface);
+        check('编辑推荐卡内侧留白', '#edit-rec-list li', 'paddingLeft', '14px');
+
+        /* ---- 14. 全部作品页（/all/）：左侧筛选项 + 右侧每本书 ---- */
+        check('筛选选项圆弧外框', '#work-filter ul li:nth-child(2)', 'borderTopLeftRadius', '12px');
+        check('筛选选项框内颜色', '#work-filter ul li:nth-child(2)', 'backgroundColor', T.surface);
+        check('筛选选项框线', '#work-filter ul li:nth-child(2)', 'borderTopColor', T.border);
+        check('筛选选项高度', '#work-filter ul li:nth-child(2)', 'height', '24px');
+        check('筛选选项文字色', '#work-filter ul li:nth-child(2) a', 'color', T.text2);
+        check('选中筛选项字色', '#work-filter ul li.act a', 'color', T.accent);
+        check('选中筛选项底色', '#work-filter ul li.act', 'backgroundColor', T.accentSoft);
+        checkFn('选中项小三角已去掉', function () {
+          return getComputedStyle(document.querySelector('#work-filter li.arrow cite')).display;
+        }, ['none']);
+        check('已选条件胶囊', '#selected-bar a', 'borderTopLeftRadius', '999px');
+        check('已选条件底色', '#selected-bar a', 'backgroundColor', T.accentSoft);
+        check('已选条件框线', '#selected-bar a', 'borderTopColor', T.accentLine);
+        check('子分类浮层底色', '#sub-type', 'backgroundColor', T.surface2);
+        check('子分类浮层圆角', '#sub-type', 'borderTopLeftRadius', '12px');
+        check('分组标题字色', '#work-filter h3', 'color', T.text);
+
+        check('工具条底色', '.tool-bar', 'backgroundColor', T.surface2);
+        check('工具条圆角', '.tool-bar', 'borderTopLeftRadius', '12px');
+        check('排序按钮圆弧外框', '#sort-plain', 'borderTopLeftRadius', '12px');
+        check('排序按钮框内颜色', '#sort-plain', 'backgroundColor', T.surface);
+        check('排序按钮框线', '#sort-plain', 'borderTopColor', T.border);
+        check('排序按钮字色', '#sort-plain', 'color', T.text2);
+        check('当前排序用强调色', '#sort-act', 'color', T.accent);
+
+        check('每本书圆弧外框', '#all-book-1', 'borderTopLeftRadius', '12px');
+        check('每本书框内颜色', '#all-book-1', 'backgroundColor', T.surface);
+        check('每本书框线', '#all-book-1', 'borderTopColor', T.border);
+        checkFn('两列浮动与 477px 宽度未被破坏', function () {
+          var s = getComputedStyle(document.getElementById('all-book-1'));
+          return s.width + '/' + s.cssFloat;
+        }, ['477px/left']);
+        checkFn('单本内容不会溢出（102+16+344 ≤ 可用宽）', function () {
+          var li = document.getElementById('all-book-1');
+          var box = li.querySelector('.book-img-box');
+          var info = li.querySelector('.book-mid-info');
+          var cs = getComputedStyle(li);
+          var avail = li.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+          return box.offsetWidth + 16 + info.offsetWidth + '<=' + avail;
+        }, ['462<=467']);
+        check('首排也有框（站点原本去掉首行边框）', '#all-book-1', 'borderTopWidth', '1px');
+        check('书单条目总高不变', '#all-book-1', 'height', '162px');
+        check('封面圆角', '.book-img-text .book-img-box a', 'borderTopLeftRadius', '10px');
+        check('封面无投影', '.book-img-text .book-img-box a', 'boxShadow', 'none');
+        check('书名字色', '.book-img-text .book-mid-info h2 a', 'color', T.text);
+        check('简介字色', '.book-img-text .book-mid-info p.intro', 'color', T.text2);
+        check('更新信息字色', '.book-img-text .book-mid-info p.update a', 'color', T.text2);
+        check('关键词高亮用强调色', '.book-img-text .book-mid-info cite.red-kw', 'color', T.accent);
+
+        /* ---- 15. html 不能设背景：否则 body 背景不再"传播到画布"，
+                   会被当普通块背景绘制，盖住站点首屏的负层级装饰层 ---- */
+        checkFn('html 不设背景（保住 body 背景的传播，负层级装饰层才看得见）', function () {
+          return getComputedStyle(document.documentElement).backgroundColor;
+        }, ['rgba(0, 0, 0, 0)']);
+        check('页面底色仍由 body 提供', 'body', 'backgroundColor', T.bg);
+        checkFn('详情页装饰层确实存在且为负层级', function () {
+          var g = document.getElementById('detail-gradient');
+          var s = getComputedStyle(g);
+          return s.zIndex + '/' + s.backgroundColor;
+        }, theme === 'dark' ? ['-9/rgb(11, 9, 16)'] : ['-9/rgb(247, 247, 252)']);
+
+        /* ---- 16. 分页 / 本周热推 / 右下固定条图标 ---- */
+        check('分页数字框圆角', '#page-2', 'borderTopLeftRadius', '12px');
+        check('分页数字框内色', '#page-2', 'backgroundColor', T.surface);
+        check('分页数字框线', '#page-2', 'borderTopColor', T.border);
+        check('分页数字可见', '#page-2', 'color', T.text2);
+        check('当前页用强调色', '#page-cur', 'backgroundColor', T.accent);
+        check('当前页字色', '#page-cur', 'color', 'rgb(255, 255, 255)');
+        check('禁用页用弱字色', '.lbf-pagination-disabled', 'color', T.text3);
+        check('跳转按钮框线', '#page-go', 'borderTopColor', T.border);
+        check('跳转按钮圆角', '#page-go', 'borderTopLeftRadius', '6px');
+        check('本周热推书名字色（站点写死 #000）', '#hot-item', 'color', T.text2);
+        check('本周热推标题字色', '.weekly-hot-rec .title', 'color', T.text3);
+        check('右下固定条图标字色提亮', '.page-bottom-fixed .page-bottom-item .iconfont', 'color', T.text);
+        check('右下固定条文字提亮', '.page-bottom-fixed .page-bottom-item .txt', 'color', T.text2);
+
+        /* ---- 17. 书籍详情页的独立模板（顶部 .nav-wrap） ---- */
+        check('详情页导航底色', '.nav-wrap', 'backgroundColor', T.surface);
+        check('详情页导航分隔线', '.nav-wrap', 'borderBottomColor', T.border);
+
+        /* ---- 18. 首页排行榜：榜首整卡不能被裁 + 栏间留白 + 圆角容器 ---- */
+        checkFn('榜首整卡高度足够容纳整卡（不能被压成单行）', function () {
+          var h = document.getElementById('rank-first').offsetHeight;
+          return h >= 80 ? 'ok' : 'too-short:' + h;
+        }, ['ok']);
+        check('榜首整卡未被裁切', '#rank-first', 'overflow', 'visible');
+        check('榜首书名可见', '#rank-first .book-name', 'color', T.text);
+        checkFn('榜首书名有实际宽度', function () {
+          return document.querySelector('#rank-first .book-name').offsetWidth > 0 ? 'ok' : 'zero';
+        }, ['ok']);
+        check('第二名单行保持紧凑', '#rank-second', 'height', '29px');
+        check('第二名单行在圆角容器内改用弱底（避免框套框）', '#rank-second', 'backgroundColor', T.surface2);
+        checkFn('第二名单行高度不溢出站点 423px 容器（整列 ≤ 423）', function () {
+          var col = document.getElementById('rank-col');
+          var li = document.getElementById('rank-second');
+          var one = li.offsetHeight + parseFloat(getComputedStyle(li).marginBottom || 0);
+          var unfold = document.getElementById('rank-first').offsetHeight + 4;
+          return unfold + one * 10 <= 423 ? 'ok' : 'overflow:' + (unfold + one * 10);
+        }, ['ok']);
+        check('榜单标题在 h2 里也可见', '#rank-second .name-box a h2', 'color', T.text);
+        checkFn('榜单标题有实际宽度', function () {
+          return document.querySelector('#rank-second .name-box a h2').offsetWidth > 0 ? 'ok' : 'zero';
+        }, ['ok']);
+        checkFn('榜单书名不会被浮动换行裁掉（这是线上 P3 的真实症状）', function () {
+          var li = document.getElementById('rank-second');
+          var liTop = li.getBoundingClientRect().top;
+          var box = li.querySelector('.name-box');
+          var r = box.getBoundingClientRect();
+          return r.top - liTop < 4 ? 'inflight' : 'wrapped:' + Math.round(r.top - liTop);
+        }, ['inflight']);
+        checkFn('榜单单行用 flex 排布（不再依赖 float）', function () {
+          return getComputedStyle(document.getElementById('rank-second')).display;
+        }, ['flex']);
+        checkFn('榜单各栏之间留了空位（grid 自动换行）', function () {
+          var s = getComputedStyle(document.getElementById('rank-row'));
+          return s.display + '/' + (parseFloat(s.columnGap) > 0 ? 'gap' : 'nogap');
+        }, ['grid/gap', 'flex/gap']);
+        check('榜单栏是圆角容器', '#rank-col', 'borderTopLeftRadius', '12px');
+        check('榜单栏容器底色', '#rank-col', 'backgroundColor', T.surface);
+        check('榜单栏容器有描边', '#rank-col', 'borderTopColor', T.border);
+
+        /* ---- 21. 详情页右栏卡片与选中态（夜间压暗 / 日间原样） ---- */
+        if (theme === 'dark') {
+          check('夜间：右栏卡片压成表面色', '#right-card', 'backgroundColor', 'rgb(23, 28, 32)');
+          check('夜间：右栏卡片标题提亮', '#right-card .work-title h3', 'color', 'rgb(190, 200, 210)');
+          check('夜间：选中态 .act 压成选中底色', '#left-act', 'backgroundColor', 'rgb(33, 40, 46)');
+        } else {
+          check('日间：右栏卡片保持白色', '#right-card', 'backgroundColor', 'rgb(255, 255, 255)');
+          check('日间：右栏标题用日间令牌（深色）', '#right-card .work-title h3', 'color', 'rgb(21, 23, 28)');
+          check('日间：选中态保持站点白底', '#left-act', 'backgroundColor', 'rgb(255, 255, 255)');
+        }
+
+        /* ---- 20. 作用域：夜间专属规则不得在日间生效 ---- */
+        if (theme === 'dark') {
+          check('夜间：自适应标记生效（压成表面色）', '#day-probe', 'backgroundColor', 'rgb(23, 28, 32)');
+          check('夜间：选中标记生效（选中底色）', '#day-probe-sel', 'backgroundColor', 'rgb(33, 40, 46)');
+          check('夜间：详情页首屏换成夜间底', '#detail-hero-gradient', 'backgroundColor', 'rgb(11, 9, 16)');
+          check('夜间：详情页首屏标题提亮', '#detail-hero-title', 'color', 'rgb(190, 200, 210)');
+        } else {
+          check('日间：自适应标记不生效（保持站点白底）', '#day-probe', 'backgroundColor', 'rgb(255, 255, 255)');
+          check('日间：自适应标记不生效（保持站点深字）', '#day-probe', 'color', 'rgb(51, 51, 51)');
+          check('日间：选中标记不生效（保持站点浅黄高亮）', '#day-probe-sel', 'backgroundColor', 'rgb(253, 246, 227)');
+          check('日间：选中单元格不被压暗', '#day-probe-sel > td', 'backgroundColor', 'rgb(253, 246, 227)');
+          check('日间：详情页首屏仍是站点浅色 #f7f7fc', '#detail-hero-gradient', 'backgroundColor', 'rgb(247, 247, 252)');
+          check('日间：详情页首屏标题仍是站点深色', '#detail-hero-title', 'color', 'rgb(25, 25, 25)');
+        }
+
+        /* ---- 19. 用户指定色号（仅夜间生效，日间跳过） ---- */
+        checkFn('夜间框内色 = #171C20', function () {
+          return theme === 'dark'
+            ? getComputedStyle(document.getElementById('book-wrap')).backgroundColor
+            : 'skip';
+        }, ['rgb(23, 28, 32)', 'skip']);
+        checkFn('夜间框线色 = #303539', function () {
+          return theme === 'dark'
+            ? getComputedStyle(document.getElementById('book-wrap')).borderTopColor
+            : 'skip';
+        }, ['rgb(48, 53, 57)', 'skip']);
+        checkFn('夜间文字色 = #BEC8D2', function () {
+          return theme === 'dark' ? getComputedStyle(document.body).color : 'skip';
+        }, ['rgb(190, 200, 210)', 'skip']);
+        checkFn('日间文字色 = #15171C', function () {
+          return theme === 'light' ? getComputedStyle(document.body).color : 'skip';
+        }, ['rgb(21, 23, 28)', 'skip']);
+
+        /* ---- 14. 作用域兜底 ---- */
+        checkFn('关闭开关后样式整体失效（作用域校验）', function () {
+          var r = document.documentElement;
+          r.removeAttribute('data-qd-minimal');
+          var v = getComputedStyle(document.body).backgroundColor;
+          r.setAttribute('data-qd-minimal', 'on');
+          return v === T.bg ? 'STILL_THEMED' : 'SCOPED_OK';
+        }, ['SCOPED_OK']);
+
+        out.push('AUDIT SUMMARY | pass=' + pass + ' fail=' + fail);
+        document.getElementById('report').textContent = '\n' + out.join('\n');
+        document.title = 'AUDIT pass=' + pass + ' fail=' + fail;
+      })();
+    </script>
+  </body>
+</html>

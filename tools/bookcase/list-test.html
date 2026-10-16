@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-qd-minimal="on" data-qd-theme="dark" data-qd-resolved="dark" data-qd-nogames="on">
+  <head>
+    <meta charset="UTF-8" />
+    <title>起点极简 · 个人中心夜间自适应 + 书架封面自检</title>
+    <link rel="stylesheet" href="../../src/theme.css" />
+    <style>
+      /* 模拟 my.qidian.com 个人中心：站点自带深色顶栏 + 白色卡片/表格/弹窗/选中项 */
+      body { background: #f5f5f5; margin: 0 }
+      .my-header { background: #3e3d43; color: #fff; height: 68px; line-height: 68px; padding-left: 24px }
+      .my-header .tab { color: #ccc; margin-left: 16px }
+      .my-header .tab.act { background: #ed4259; color: #fff; padding: 0 12px }
+      .my-body { display: flex; gap: 24px; padding: 24px }
+      .side-item { color: #666; display: block; height: 40px; line-height: 40px; padding: 0 16px; width: 160px }
+      .side-item.act { background: #fff; color: #ed4259 }
+      .content { flex: 1 1 auto }
+      .panel { background: #fff; border-radius: 8px; padding: 16px }
+      .panel-title { color: #333; font-size: 16px; margin-bottom: 12px }
+      .list { border-collapse: collapse; width: 100% }
+      .list th { color: #999; font-weight: 400; text-align: left }
+      .list td { border-bottom: 1px solid #eee; color: #333; padding: 10px 6px; vertical-align: middle }
+      .list .name a { color: #333; text-decoration: none }
+      .list .name .dark-link { color: #3f5a93 }
+      .list .name .book-info { margin: 0 }
+      .list .name .block-title { display: block; font-size: 14px; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+      /* 选中行：浅色高亮刷在 tr 与 td 两层（模拟站点最常见的写法） */
+      #sel-table tr.picked,
+      #sel-table tr.picked > td { background: #fdf6e3 }
+      .list .chapter { color: #666; font-size: 12px }
+      .list .author { color: #999 }
+      .modal-mask { background: rgba(0, 0, 0, 0.45); padding: 40px; text-align: center }
+      .modal { background: #fff; border-radius: 12px; display: inline-block; padding: 28px 40px; text-align: center }
+      .modal-title { color: #000; font-size: 18px; margin-bottom: 10px }
+      .modal-btn { background: #17181d; color: #fff; display: inline-block; padding: 8px 40px }
+      /* 大面积浅蓝卡片：按新规则应被压暗（夜里不留大片亮色） */
+      .color-card { background: #e3f2fd; color: #333; padding: 12px; border-radius: 8px; margin-top: 16px }
+      /* 小面积浅蓝徽标：必须保持原样 */
+      .color-badge { background: #e3f2fd; color: #333; display: inline-block; font-size: 12px; padding: 2px 8px }
+      /* 暗底暗字（模拟底部操作条 / 页脚链接）：应被提亮 */
+      .action-bar { background: #17181d; margin-top: 16px; padding: 10px 16px }
+      .action-bar a { color: #3a3d44 }
+      /* 推荐位（非表格行）：不该被塞小封面 */
+      .rec-row { display: block; margin-top: 16px }
+      .rec-row a { color: #333; display: inline-block; margin-right: 12px }
+      /* 最近阅读卡片：按原行高写死高度（模拟站点），注入封面后会装不下 */
+      .recent-card { background: #fff; border: 1px solid #e6e6e6; border-radius: 8px; height: 70px; overflow: visible; padding: 12px }
+      .card-title { color: #333; font-size: 15px; margin-bottom: 8px }
+      /* 站点有意做的内滚动区 */
+      .scroll-box { background: #fff; border: 1px solid #e6e6e6; border-radius: 8px; height: 70px; margin-top: 16px; overflow: auto; padding: 12px }
+    </style>
+  </head>
+
+  <body>
+    <div class="my-header">
+      <span class="brand">起点 个人中心</span>
+      <a class="tab act" href="#">我的书架</a>
+      <a class="tab" href="#">消息中心</a>
+    </div>
+
+    <div class="my-body">
+      <div class="side-menu">
+        <a class="side-item act" id="side-act" href="#">我的书架</a>
+        <a class="side-item" href="#">账务中心</a>
+        <a class="side-item" href="#">我的票夹</a>
+      </div>
+
+      <div class="content">
+        <div class="panel" id="panel">
+          <div class="panel-title" id="panel-title">默认分组 共 2 本书籍</div>
+          <table class="list" id="book-table">
+            <thead>
+              <tr><th>书名/最近更新章节</th><th>更新时间</th><th>作者</th></tr>
+            </thead>
+            <tbody>
+              <tr id="row-1">
+                <td class="name" id="cell-1">
+                  <div class="book-info" id="wrap-1"><em class="tag">「轻小说」</em><a href="//www.qidian.com/book/1035420986/">不当妈妈可以吗</a><span class="chapter"> 第一百七十五章</span></div>
+                  <a class="dark-link" href="#">详情</a>
+                </td>
+                <td class="time">2小时前</td>
+                <td class="author">系星兔</td>
+              </tr>
+              <tr id="row-2">
+                <td class="name" id="cell-2"><em class="tag">「玄幻」</em><a href="//www.qidian.com/book/1040765595/">夜无疆</a><span class="chapter"> 第846章</span></td>
+                <td class="time">17小时前</td>
+                <td class="author">辰东</td>
+              </tr>
+              <tr id="row-3">
+                <td class="name" id="cell-3"><em class="tag">「诸天无限」</em><a href="//www.qidian.com/book/1048859382/">夜夜行歌</a><span class="chapter"> 第12章</span></td>
+                <td class="time">昨天</td>
+                <td class="author">某人</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- 最近阅读模板：卡片按原行高写死了高度，注入封面后行会溢出边框 -->
+          <div class="recent-card" id="recent-card">
+            <div class="card-title">最近阅读 最多显示最近阅读的 100 本书</div>
+            <table class="list" id="recent-table">
+              <tbody>
+                <tr id="recent-1"><td class="name"><em class="tag">「历史」</em><a href="//www.qidian.com/book/1033014772/">穷鬼的上下两千年</a><span class="chapter"> 新书已发</span></td><td class="time">2026-05-24</td><td class="author">非玩家角色</td></tr>
+                <tr id="recent-2"><td class="name"><em class="tag">「轻小说」</em><a href="//www.qidian.com/book/1035420986/">宅魔女</a><span class="chapter"> 新书《宅山姆》上架了</span></td><td class="time">2026-04-10</td><td class="author">咸鱼成仙</td></tr>
+                <tr id="recent-3"><td class="name"><em class="tag">「科幻」</em><a href="//www.qidian.com/book/1041604040/">全民魔女1994</a><span class="chapter"> 新书</span></td><td class="time">2026-04-10</td><td class="author">宇宙鸽</td></tr>
+                <tr id="recent-4"><td class="name"><em class="tag">「诸天无限」</em><a href="//www.qidian.com/book/1049898328/">血之圣典</a><span class="chapter"> 新书</span></td><td class="time">2025-12-11</td><td class="author">咯嘛</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 站点有意做的内滚动区：不能被放开高度 -->
+          <div class="scroll-box" id="scroll-box">
+            <table class="list" id="scroll-table">
+              <tbody>
+                <tr id="scroll-1"><td class="name"><a href="//www.qidian.com/book/1042256511/">滚动区里的书</a></td><td class="time">昨天</td><td class="author">某人</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 书名放在块级标题里（另一种真实结构）：绝不能被当成标签压成「…」。
+               这种结构下书名本来就另起一行，所以不参与「书名起点对齐」的比较。 -->
+          <table class="list" id="block-table">
+            <tbody>
+              <tr id="block-row">
+                <td class="name" id="cell-block">
+                  <div class="book-info" id="wrap-block"><em class="tag">「历史」</em><h3 class="block-title"><a href="//www.qidian.com/book/1033014772/">穷鬼的上下两千年</a></h3></div>
+                </td>
+                <td class="time">2026-05-24</td>
+                <td class="author">非玩家角色</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- 选中态：站点把浅色高亮刷在 tr 和 td 上（命名未知，靠与兄弟行对比识别） -->
+          <table class="list" id="sel-table">
+            <tbody>
+              <tr id="sel-1"><td class="name">未选中的书</td><td class="time">昨天</td><td class="author">某人</td></tr>
+              <tr id="sel-2" class="picked"><td class="name">选中的书</td><td class="time">2026-10-12</td><td class="author">弧盐</td></tr>
+              <tr id="sel-3"><td class="name">未选中的书二</td><td class="time">前天</td><td class="author">某人</td></tr>
+            </tbody>
+          </table>
+
+          <!-- 非表格模板（ul/li）：同样要能补封面，且已有图的行要跳过 -->
+          <ul class="book-list-plain" id="plain-list">
+            <li id="plain-row"><a href="//www.qidian.com/book/1050460263/">神宠供应商</a><span class="chapter"> 第1章</span></li>
+            <li id="plain-row-img">
+              <img alt="已有封面" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+              <a href="//www.qidian.com/book/1050460264/">这本书已经带图了</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="modal-mask">
+          <div class="modal" id="modal">
+            <div class="modal-title" id="modal-title">全新用户等级体系</div>
+            <a class="modal-btn" href="#">查看新等级</a>
+          </div>
+        </div>
+
+        <div class="color-card" id="color-card">大面积浅蓝卡片：夜间应被压暗，不留大片亮色
+          <span class="color-badge" id="color-badge">小徽标</span>
+        </div>
+
+        <div class="action-bar" id="action-bar">
+          <a href="#" id="action-select-all">全选</a>
+          <a href="#">置顶</a>
+          <a href="#">移动至</a>
+          <a href="#">删除</a>
+        </div>
+
+        <div class="rec-row" id="rec-row">
+          <a href="//www.qidian.com/book/1050460263/">神宠供应商</a>
+          <a href="//www.qidian.com/book/1048859382/">夜夜行歌</a>
+        </div>
+      </div>
+    </div>
+
+    
+
+    <pre id="report">RUNNING</pre>
+
+    <script>
+      (function () {
+        var store = {
+          enabled: true,
+          theme: 'dark',
+          removeGames: true,
+          hideAds: false,
+          showToggle: true
+        };
+        window.__qdStore = store;
+        window.chrome = {
+          storage: {
+            sync: {
+              get: function (keys, cb) {
+                var out = {};
+                (Array.isArray(keys) ? keys : Object.keys(keys || store)).forEach(function (k) {
+                  if (k in store) out[k] = store[k];
+                });
+                setTimeout(function () {
+                  cb(out);
+                }, 0);
+              },
+              set: function (obj, cb) {
+                Object.assign(store, obj);
+                setTimeout(function () {
+                  if (cb) cb();
+                }, 0);
+              }
+            },
+            onChanged: { addListener: function () {} }
+          },
+          runtime: {
+            getURL: function (p) {
+              return '../../' + p;
+            },
+            onMessage: {
+              addListener: function (fn) {
+                window.__qdMsg = fn;
+              }
+            }
+          }
+        };
+        var s = document.createElement('script');
+        s.src = '../../src/content.js';
+        document.head.appendChild(s);
+      })();
+
+      var out = [];
+      var pass = 0;
+      var fail = 0;
+      function ck(name, actual, expected) {
+        var ok = Array.isArray(expected) ? expected.indexOf(actual) !== -1 : actual === expected;
+        if (ok) {
+          pass++;
+          out.push('CT PASS | ' + name + ' | ' + actual);
+        } else {
+          fail++;
+          out.push('CT FAIL | ' + name + ' | ' + actual + ' | 期望 ' + expected);
+        }
+      }
+      function bg(sel) {
+        var el = document.querySelector(sel);
+        return el ? getComputedStyle(el).backgroundColor : '__MISSING__';
+      }
+      function fg(sel) {
+        var el = document.querySelector(sel);
+        return el ? getComputedStyle(el).color : '__MISSING__';
+      }
+      var DARKS = ["rgb(23, 28, 32)", "rgb(33, 40, 46)", "rgb(11, 9, 16)", "rgb(27, 33, 38)"];
+      function ckDark(name, sel) {
+        var el = document.querySelector(sel);
+        var v = el ? getComputedStyle(el).backgroundColor : "__MISSING__";
+        ck(name, DARKS.indexOf(v) !== -1 ? "dark" : "still-light:" + v, "dark");
+      }
+      function marked(sel) {
+        var el = document.querySelector(sel);
+        return el ? el.hasAttribute('data-qd-light') : '__MISSING__';
+      }
+      // 「排版整齐」的量化标准：所有封面左边缘相同、所有书名起点相同、标签占位一致。
+      // 这里刻意用三种不同长度的标签（2/3/4 字）来验证普世性，而不是对着某个宽度调参。
+      function checkAlign() {
+        function distinct(list) {
+          return list.filter(function (v, i, arr) {
+            return arr.indexOf(v) === i;
+          });
+        }
+        function lefts(sel) {
+          var out = [];
+          var els = document.querySelectorAll(sel);
+          for (var i = 0; i < els.length; i++) out.push(Math.round(els[i].getBoundingClientRect().left));
+          return out;
+        }
+        var coverLefts = lefts('#book-table .qd-cover-box');
+        var u1 = distinct(coverLefts);
+        ck('所有行的封面左边缘对齐（' + coverLefts.length + ' 行）',
+          u1.length === 1 ? 'aligned' : 'off:' + u1.join('/'), 'aligned');
+
+        var titleLefts = lefts('#book-table a[data-qd-cover]');
+        var u2 = distinct(titleLefts);
+        ck('所有行的书名起点对齐（含 4 字长标签）',
+          u2.length === 1 ? 'aligned' : 'off:' + u2.join('/'), 'aligned');
+
+        var tags = document.querySelectorAll('#book-table .qd-cover-tag');
+        var widths = [];
+        var clipped = 0;
+        for (var i = 0; i < tags.length; i++) {
+          widths.push(Math.round(tags[i].getBoundingClientRect().width));
+          if (tags[i].scrollWidth > tags[i].offsetWidth + 1) clipped++;
+        }
+        var u3 = distinct(widths);
+        ck('标签占位宽度自动统一', u3.length === 1 ? 'uniform(' + u3[0] + 'px)' : 'mixed:' + u3.join('/'), 'uniform(' + u3[0] + 'px)');
+        ck('没有标签被压窄/截断', clipped, 0);
+        ck('统一宽度取自实测变量（不是写死的常数）',
+          /^\d+px$/.test((getComputedStyle(document.documentElement).getPropertyValue('--qd-tag-w') || '').trim()) ? 'measured' : 'missing',
+          'measured');
+      }
+
+      setTimeout(function () {
+        try {
+          var SURFACE = 'rgb(23, 28, 32)';
+          var SURFACE3 = 'rgb(33, 40, 46)';
+          var TEXT = 'rgb(190, 200, 210)';
+          var TEXT2 = 'rgb(163, 174, 187)';
+
+          ck('URL 在 /bookcase/ 路径下（封面注入的触发条件）', /\/bookcase\//.test(location.pathname), true);
+          ck('当前是夜间', document.documentElement.getAttribute('data-qd-resolved'), 'dark');
+
+          /* ---- 1. 白块被标记并换成表面色 ---- */
+          ck('白色卡片被标记', marked('#panel'), true);
+          ck('白色卡片底色已换成表面色', bg('#panel'), SURFACE);
+          ck('弹窗白块被标记（弹窗也要夜间）', marked('#modal'), true);
+          ck('弹窗底色已换成表面色', bg('#modal'), SURFACE);
+          ckDark('侧栏选中项在夜间必须是暗色', '#side-act');
+
+          /* ---- 2. 文字可辨认性 ---- */
+          ck('卡片标题文字提亮', fg('#panel-title'), TEXT);
+          ck('表格正文文字提亮', fg('#row-1 .name a[data-qd-cover]'), TEXT);
+          ck('已是中灰的文字不被过度接管（#999 在深底仍有 ~4.1:1 对比度）', fg('#row-1 .author'), 'rgb(153, 153, 153)');
+          ck('章节次要文字提亮', fg('#row-1 .chapter'), TEXT2);
+          ck('暗蓝链接也被接管（亮度判定，保可读性）', fg('#row-1 .dark-link'), TEXT2);
+          ck('弹窗标题文字提亮', fg('#modal-title'), TEXT);
+
+          /* ---- 3. 不该动的地方一个都不能动 ---- */
+          ck('站点自带深色顶栏未被标记', marked('.my-header'), false);
+          ck('顶栏底色保持站点原样', bg('.my-header'), 'rgb(62, 61, 67)');
+          ck('顶栏白字保持白色', fg('.my-header'), 'rgb(255, 255, 255)');
+          ck('顶栏红色激活标签未被标记', marked('.my-header .tab.act'), false);
+
+          /* ---- 4. 大面积亮色必须压暗（不论色相）；小面积彩色块保持原样 ---- */
+          ck('大面积浅蓝卡片被压暗（夜里不留大片亮色）', marked('#color-card'), true);
+          ck('大面积浅蓝卡片底色已换成表面色', bg('#color-card'), SURFACE);
+          ck('小面积彩色徽标未被误伤', marked('#color-badge'), false);
+          ck('小徽标底色保持原样', bg('#color-badge'), 'rgb(227, 242, 253)');
+
+          /* ---- 5. 暗底暗字必须提亮（底部操作条 / 页脚链接） ---- */
+          ck('底部操作条文字被提亮', fg('#action-select-all'), TEXT);
+          ck('底部操作条其余文字也被提亮', fg('#action-bar a:nth-child(4)'), TEXT);
+
+          /* ---- 6. 书架封面：模板无关 ---- */
+          var covers = document.querySelectorAll('.qd-cover-box img.qd-cover');
+          ck('表格里的每本书都注入了封面', document.querySelectorAll('#book-table .qd-cover-box').length, 3);
+          ck('列表（ul/li）模板的书也能补封面', document.querySelectorAll('#plain-row .qd-cover-box').length, 1);
+          ck('行内已有图的不会被重复塞封面', document.querySelectorAll('#plain-row-img .qd-cover-box').length, 0);
+          ck('第一本封面地址取自真实规律', covers[0] ? /\/1035420986\/150\.webp$/.test(covers[0].src) : '__MISSING__', true);
+          ck('封面走的是站点图床', covers[0] ? covers[0].src.indexOf('https://bookcover.yuewen.com/qdbimg/349573/') === 0 : '__MISSING__', true);
+          ck('同一行不会重复注入', document.querySelectorAll('#row-1 .qd-cover-box').length, 1);
+          ck('行上留了去重标记', document.getElementById('row-1').getAttribute('data-qd-cover-row'), '1');
+          ck('非表格行的推荐位不会被塞小封面', document.querySelectorAll('#rec-row .qd-cover-box').length, 0);
+          ck('封面是书格的第一个子元素（整列左对齐）', document.getElementById('cell-1').firstElementChild.className, 'qd-cover-box');
+          checkAlign();
+          ck('封面用链接包裹（可点击）', covers[0] ? covers[0].parentNode.tagName : '__MISSING__', 'A');
+          ck('封面链接指向同一本书', covers[0] ? /\/book\/1035420986\//.test(covers[0].parentNode.getAttribute('href')) : '__MISSING__', true);
+          ck('书格标记为垂直居中', document.getElementById('cell-1').classList.contains('qd-cover-cell'), true);
+          ck('书格垂直居中已生效', document.getElementById('cell-1') ? getComputedStyle(document.getElementById('cell-1')).verticalAlign : '__MISSING__', 'middle');
+          ck('封面尺寸已主题化', covers[0] ? getComputedStyle(covers[0]).width + 'x' + getComputedStyle(covers[0]).height : '__MISSING__', '40pxx53px');
+          ck('封面圆角已应用', covers[0] ? getComputedStyle(covers[0]).borderTopLeftRadius : '__MISSING__', '12px');
+          ck('封面与文字间距统一', covers[0] ? getComputedStyle(covers[0].parentNode).marginRight : '__MISSING__', '10px');
+
+          /* ---- 7. 容器装不下时要放开高度（最近阅读页行溢出边框的问题） ---- */
+          var card = document.getElementById('recent-card');
+          ck('装不下的卡片被标记为可放开高度', card.classList.contains('qd-grow'), true);
+          ck('卡片固定高度已放开（行不再溢出边框）', getComputedStyle(card).height === '70px' ? 'still-fixed' : 'relaxed', 'relaxed');
+          ck('卡片内容不再超出自身盒子', card.scrollHeight <= card.clientHeight + 2 ? 'fits' : 'overflows:' + card.scrollHeight + '/' + card.clientHeight, 'fits');
+          ck('overflow:auto 的内滚动区不被放开', document.getElementById('scroll-box').classList.contains('qd-grow'), false);
+          ck('内滚动区仍保持原高度', getComputedStyle(document.getElementById('scroll-box')).height, '70px');
+
+          /* ---- 9. 书名不能被压成「…」（本轮回归的守卫） ---- */
+          var wrap = document.getElementById('wrap-1');
+          var titleLink = document.querySelector('#cell-1 a[data-qd-cover]');
+          ck('书名外层的容器没有被当成标签', wrap.classList.contains('qd-cover-tag'), false);
+          ck('容器没有被改成 inline-block', getComputedStyle(wrap).display, 'block');
+          ck('容器没有被强制 nowrap', getComputedStyle(wrap).whiteSpace === 'nowrap' ? 'nowrap' : 'normal', 'normal');
+          ck('书名没有被压成省略号', titleLink && titleLink.getBoundingClientRect().width > 60 ? 'ok' : 'collapsed:' + (titleLink ? Math.round(titleLink.getBoundingClientRect().width) : 'missing'), 'ok');
+          ck('书名文字确实渲染出来了', (titleLink ? titleLink.textContent.replace(/\s+/g, '') : ''), '不当妈妈可以吗');
+          ck('容器里的标签仍然被正确标记', wrap.querySelector('.qd-cover-tag') ? wrap.querySelector('.qd-cover-tag').textContent.replace(/\s+/g, '') : '__MISSING__', '「轻小说」');
+          // 块级标题结构：同样不能被压坏（它本来就在下一行，不参与起点对齐比较）
+          var blockWrap = document.getElementById('wrap-block');
+          var blockLink = document.querySelector('#cell-block a[data-qd-cover]');
+          ck('块级结构下容器也没被当成标签', blockWrap.classList.contains('qd-cover-tag'), false);
+          ck('块级结构下书名没被压成省略号', blockLink && blockLink.getBoundingClientRect().width > 60 ? 'ok' : 'collapsed:' + (blockLink ? Math.round(blockLink.getBoundingClientRect().width) : 'missing'), 'ok');
+          ck('块级结构下块标题仍保持块级', getComputedStyle(document.querySelector('#wrap-block .block-title')).display, 'block');
+
+          /* ---- 10. 选中行必须变暗（不依赖 class 命名） ---- */
+          var selRow = document.getElementById('sel-2');
+          ckDark('选中行在夜间必须是暗色', '#sel-2');
+          ckDark('选中行的单元格也必须压暗（高亮常刷在 td 上）', '#sel-2 > td.name');
+          ck('未选中的行不受影响', selRow.hasAttribute('data-qd-sel') && document.getElementById('sel-1').hasAttribute('data-qd-sel'), false);
+          ck('选中行文字保持可读', fg('#sel-2 > td.name'), TEXT);
+          /* ---- 8. 全页对齐复检：每一组书目里，封面左边缘与书名起点都必须一致 ---- */
+          function groupAlign(listSel, itemSel) {
+            var lists = document.querySelectorAll(listSel);
+            var problems = [];
+            var checked = 0;
+            for (var i = 0; i < lists.length; i++) {
+              var items = lists[i].querySelectorAll(itemSel);
+              if (items.length < 2) continue;
+              var first = Math.round(items[0].getBoundingClientRect().left);
+              checked++;
+              for (var j = 1; j < items.length; j++) {
+                var x = Math.round(items[j].getBoundingClientRect().left);
+                if (x !== first) problems.push(items.length + '项:' + first + '/' + x);
+              }
+            }
+            return { checked: checked, problems: problems };
+          }
+          var coverAlign = groupAlign('#book-table, #recent-table, #plain-list', '.qd-cover-box');
+          ck('所有书目组的封面左边缘一致（' + coverAlign.checked + ' 组）', coverAlign.problems.length ? coverAlign.problems.join(' ') : 'aligned', 'aligned');
+          var titleAlign = groupAlign('#book-table, #recent-table, #plain-list', 'a[data-qd-cover]');
+          ck('所有书目组的书名起点一致（' + titleAlign.checked + ' 组）', titleAlign.problems.length ? titleAlign.problems.join(' ') : 'aligned', 'aligned');
+          var tagAlign = groupAlign('#book-table, #recent-table', '.qd-cover-tag');
+          ck('所有书目组的标签占位一致', tagAlign.problems.length ? tagAlign.problems.join(' ') : 'aligned', 'aligned');
+        } catch (e) {
+          fail++;
+          out.push('CT FAIL | 断言过程抛错 | ' + (e && e.message));
+        }
+
+          /* ---- 回归包（含动态夹具）：书名不许被压扁、选中态必须暗 ---- */
+          var coverLinks = document.querySelectorAll("a[data-qd-cover]");
+          var collapsedCount = 0;
+          for (var ci = 0; ci < coverLinks.length; ci++) {
+            if (coverLinks[ci].getBoundingClientRect().width < 20) collapsedCount++;
+          }
+          ck("没有书名被压成「…」（量实际宽度）", collapsedCount, 0);
+          ck("书名文字确实渲染出来了", document.querySelector("a[data-qd-cover]") ? document.querySelector("a[data-qd-cover]").textContent.replace(/\s+/g, "") : "__MISSING__", "不当妈妈可以吗");
+          ckDark("选中行在夜间必须是暗色", "#sel-2");
+          ckDark("选中行的单元格也必须压暗（高亮常刷在 td 上）", "#sel-2 > td.name");
+          ckDark("侧栏选中项在夜间必须是暗色", "#side-act");
+          ckDark("大面积浅蓝卡片在夜间必须压暗", "#color-card");
+        out.push('CT SUMMARY | pass=' + pass + ' fail=' + fail);
+        document.getElementById('report').textContent = '\n' + out.join('\n');
+        document.title = 'CT pass=' + pass + ' fail=' + fail;
+      }, 700);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+{
+  "manifest_version": 3,
+  "name": "起点极简 · Qidian Minimal",
+  "short_name": "起点极简",
+  "version": "1.10.0",
+  "description": "把起点中文网改造成现代几何极简风：日间/夜间一键切换、导航与排版优化、移除页游入口。阅读页（chapter）完全保持原样，不做任何注入。",
+  "author": "qidian-minimal",
+  "minimum_chrome_version": "102",
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "permissions": ["storage", "clipboardWrite"],
+
+  "host_permissions": ["*://qidian.com/*", "*://*.qidian.com/*"],
+
+  "background": {
+    "service_worker": "src/background.js"
+  },
+
+  "action": {
+    "default_title": "起点极简",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://qidian.com/*", "*://*.qidian.com/*"],
+      "exclude_matches": [
+        "*://read.qidian.com/*",
+        "*://vipreader.qidian.com/*",
+        "*://passport.qidian.com/*",
+        "*://ptlogin.qidian.com/*",
+        "*://pay.qidian.com/*",
+        "*://m.qidian.com/*",
+        "*://qidian.com/chapter/*",
+        "*://*.qidian.com/chapter/*"
+      ],
+      "js": ["src/early.js"],
+      "run_at": "document_start",
+      "all_frames": false,
+      "match_about_blank": false
+    },
+    {
+      "matches": ["*://qidian.com/*", "*://*.qidian.com/*"],
+      "exclude_matches": [
+        "*://read.qidian.com/*",
+        "*://vipreader.qidian.com/*",
+        "*://passport.qidian.com/*",
+        "*://ptlogin.qidian.com/*",
+        "*://pay.qidian.com/*",
+        "*://m.qidian.com/*",
+        "*://qidian.com/chapter/*",
+        "*://*.qidian.com/chapter/*"
+      ],
+      "css": ["src/theme.css"],
+      "js": ["src/content.js"],
+      "run_at": "document_end",
+      "all_frames": false,
+      "match_about_blank": false
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["src/theme.css"],
+      "matches": ["*://qidian.com/*", "*://*.qidian.com/*"]
+    }
+  ]
+}

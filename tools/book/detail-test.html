@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-qd-minimal="on" data-qd-theme="dark" data-qd-nogames="on">
+  <head>
+    <meta charset="UTF-8" />
+    <title>起点极简 · 书籍详情页固定日间自检</title>
+    <link rel="stylesheet" href="../../src/theme.css" />
+    <style>
+      /* 站点风格：浅色玻璃拟态首屏 + 负层级装饰层 */
+      .book-detail { position: relative; height: 200px; }
+      .book-detail .gradient {
+        background-color: #f7f7fc; bottom: 0; left: 0; position: absolute; right: 0; top: 0; z-index: -9;
+      }
+      .book-author { background: rgba(255, 255, 255, 0.5); border-radius: 10px; margin: 20px; padding: 20px; width: 420px; }
+    </style>
+  </head>
+  <body>
+    <div class="nav-wrap">
+      <div class="left-items"><div class="qidian-logo">起点</div><div class="catalog-a">全部作品</div></div>
+      <div class="right-items"><div class="my-bookshelf">我的书架</div></div>
+    </div>
+
+    <div class="book-detail">
+      <div class="gradient"></div>
+      <div class="book-author">作品信息</div>
+    </div>
+    <div class="book-detail-mid">作品简介</div>
+
+    <pre id="report">RUNNING</pre>
+
+    <script>
+      (function () {
+        // 存储里的主题故意设成 dark：详情页必须无视它、固定日间
+        var store = {
+          enabled: true,
+          theme: 'dark',
+          removeGames: true,
+          hideAds: false,
+          showToggle: true
+        };
+        window.__qdStore = store;
+        window.chrome = {
+          storage: {
+            sync: {
+              get: function (keys, cb) {
+                var out = {};
+                (Array.isArray(keys) ? keys : Object.keys(keys || store)).forEach(function (k) {
+                  if (k in store) out[k] = store[k];
+                });
+                setTimeout(function () {
+                  cb(out);
+                }, 0);
+              },
+              set: function (obj, cb) {
+                Object.assign(store, obj);
+                setTimeout(function () {
+                  if (cb) cb();
+                }, 0);
+              }
+            },
+            onChanged: { addListener: function () {} }
+          },
+          runtime: {
+            getURL: function (p) {
+              return '../../' + p;
+            },
+            onMessage: {
+              addListener: function (fn) {
+                window.__qdMsg = fn;
+              }
+            }
+          }
+        };
+        var s = document.createElement('script');
+        s.src = '../../src/content.js';
+        document.head.appendChild(s);
+      })();
+
+      var out = [];
+      var pass = 0;
+      var fail = 0;
+      function ck(name, actual, expected) {
+        var ok = Array.isArray(expected) ? expected.indexOf(actual) !== -1 : actual === expected;
+        if (ok) {
+          pass++;
+          out.push('CT PASS | ' + name + ' | ' + actual);
+        } else {
+          fail++;
+          out.push('CT FAIL | ' + name + ' | ' + actual + ' | 期望 ' + expected);
+        }
+      }
+
+      setTimeout(function () {
+        try {
+          var root = document.documentElement;
+
+          ck('URL 确实在 /book/ 路径下', /\/book\//.test(location.pathname), true);
+          ck('存储里的主题是 dark（构造冲突）', window.__qdStore.theme, 'dark');
+          ck('详情页主题正常生效（v1.7.0 起并入夜间）', root.getAttribute('data-qd-theme'), 'dark');
+          ck('不再标记 daylock', root.getAttribute('data-qd-daylock'), null);
+          ck('解析主题也报 dark', root.getAttribute('data-qd-resolved'), 'dark');
+          ck('正常挂载悬浮日夜按钮（详情页不再被锁）', !!document.getElementById('qd-minimal-toggle'), true);
+          ck('极简标记仍在（日间样式照常生效）', root.getAttribute('data-qd-minimal'), 'on');
+
+          if (window.__qdMsg) {
+            var r1 = null;
+            window.__qdMsg({ type: 'qd:toggle-theme' }, null, function (r) {
+              r1 = r;
+            });
+            ck('日夜切换请求正常生效', r1 && r1.locked, undefined);
+            ck('快捷键切到日间后主题跟着变', root.getAttribute('data-qd-theme'), 'light');
+
+            var r2 = null;
+            window.__qdMsg({ type: 'qd:cycle-theme' }, null, function (r) {
+              r2 = r;
+            });
+            ck('轮换主题正常生效', r2 && r2.locked, undefined);
+
+            var st = null;
+            window.__qdMsg({ type: 'qd:state' }, null, function (r) {
+              st = r;
+            });
+            ck('状态接口不再上报 lockedDay', st && st.lockedDay, false);
+            ck('状态接口上报非阅读页', st && st.reader, false);
+          } else {
+            ck('已注册消息监听', false, true);
+          }
+
+          // 首屏浅色层不能被 body 底色盖住（html 不设背景）
+          ck('html 未设背景', getComputedStyle(root).backgroundColor, 'rgba(0, 0, 0, 0)');
+          ck('详情页装饰层仍为负层级', getComputedStyle(document.querySelector('.gradient')).zIndex, '-9');
+          ck('详情页导航已按夜间主题化', getComputedStyle(document.querySelector('.nav-wrap')).borderBottomColor,
+            getComputedStyle(root).getPropertyValue('--qd-border').trim() === '#e4e7ec'
+              ? 'rgb(228, 231, 236)'
+              : 'rgb(48, 53, 57)');
+        } catch (e) {
+          fail++;
+          out.push('CT FAIL | 断言过程抛错 | ' + (e && e.message));
+        }
+
+        out.push('CT SUMMARY | pass=' + pass + ' fail=' + fail);
+        document.getElementById('report').textContent = '\n' + out.join('\n');
+        document.title = 'CT pass=' + pass + ' fail=' + fail;
+      }, 260);
+    </script>
+  </body>
+</html>

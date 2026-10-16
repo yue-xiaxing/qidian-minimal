@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-qd-minimal="on" data-qd-theme="dark" data-qd-nogames="on" data-qd-noads="on" data-qd-grid="on">
+  <head>
+    <meta charset="UTF-8" />
+    <title>起点极简 · content.js 行为自检（站点页）</title>
+    <link rel="stylesheet" href="../src/theme.css" />
+  </head>
+  <body>
+    <!-- 夹具：模拟起点顶部导航 + 页游入口 -->
+    <div class="header">
+      <div class="header-inner">
+        <ul class="nav">
+          <li class="active"><a href="/">首页</a></li>
+          <!-- 分类名含「游戏」，绝不能被删 -->
+          <li id="nav-game-cat"><a href="/all/21/">游戏竞技</a></li>
+          <!-- 文本精确命中「页游」，必须被删 -->
+          <li id="nav-webgame"><a href="/webgame/">页游</a></li>
+          <!-- 文本不含页游，但 href 指向 game.qidian.com，必须被删 -->
+          <li id="nav-more-game"><a href="//game.qidian.com/">更多</a></li>
+          <!-- 网页游戏外链，必须被删 -->
+          <li id="nav-wan"><a href="https://wan.qidian.com/">入口</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 非链接型入口：类名含 game + 文本命中 -->
+    <div class="game-entry" id="game-entry-box">页游中心</div>
+
+    <!-- 假阳性诱饵：类名含 game 但文本很长，不能隐藏 -->
+    <div class="game-news" id="game-news">
+      游戏竞技分类下的新书推荐与本周榜单更新说明，这段文本很长，不应该被隐藏。
+    </div>
+
+    <!-- 实抓到的页游入口：顶部随机广告条（JS 会 inline 设成 display:block）+ 导航里的页游项 -->
+    <div class="top-op-box" id="j-topOpBox">
+      <div class="top-game-op" id="topGameOp" style="display: block">
+        <div class="game-wrap">
+          <a class="close" id="closeTopGame" href="javascript:"><em class="iconfont">×</em></a>
+          <a href="https://game.qidian.com/CpGameHome/Ad/directLogin?x"><span class="op-tag">页游</span></a>
+        </div>
+      </div>
+    </div>
+    <ul class="main-nav">
+      <li class="nav-li"><a class="act" href="/rank/">排行</a></li>
+      <li class="game web" id="game-web">
+        <a class="web-game" href="https://game.qidian.com?qd_game_key=qdzw_homepage_Topbar"><b class="iconfont">G</b>页游</a>
+        <div class="game-dropdown hidden" id="web-dropdown"><cite></cite><div class="web-game-list"></div></div>
+      </li>
+    </ul>
+
+    <ul class="book-list">
+      <li><div class="book-mid-info"><h3><a href="/book/1/">凡人修仙传</a></h3></div></li>
+    </ul>
+
+    <pre id="report">RUNNING</pre>
+
+    <script>
+      window.QD_SETTINGS = { theme: 'dark', removeGames: true, showToggle: true, enabled: true };
+
+      // ---- chrome API 桩 ----
+      (function () {
+        var store = Object.assign(
+          {
+            enabled: true,
+            theme: 'auto',
+            removeGames: true,
+            hideAds: false,
+            showToggle: true
+          },
+          window.QD_SETTINGS || {}
+        );
+        window.__qdStore = store;
+        window.chrome = {
+          storage: {
+            sync: {
+              get: function (keys, cb) {
+                var out = {};
+                (Array.isArray(keys) ? keys : Object.keys(keys || store)).forEach(function (k) {
+                  if (k in store) out[k] = store[k];
+                });
+                setTimeout(function () {
+                  cb(out);
+                }, 0);
+              },
+              set: function (obj, cb) {
+                Object.assign(store, obj);
+                setTimeout(function () {
+                  if (cb) cb();
+                }, 0);
+              }
+            },
+            onChanged: { addListener: function () {} }
+          },
+          runtime: {
+            getURL: function (p) {
+              return '../' + p;
+            },
+            onMessage: {
+              addListener: function (fn) {
+                window.__qdMsg = fn;
+              }
+            }
+          }
+        };
+      })();
+
+      // ---- 加载被测脚本 ----
+      (function () {
+        var s = document.createElement('script');
+        s.src = '../src/content.js';
+        document.head.appendChild(s);
+      })();
+
+      // ---- 断言 ----
+      var out = [];
+      var pass = 0;
+      var fail = 0;
+      function ck(name, actual, expected) {
+        var ok = Array.isArray(expected) ? expected.indexOf(actual) !== -1 : actual === expected;
+        if (ok) {
+          pass++;
+          out.push('CT PASS | ' + name + ' | ' + actual);
+        } else {
+          fail++;
+          out.push(
+            'CT FAIL | ' + name + ' | ' + actual + ' | 期望 ' + (Array.isArray(expected) ? expected.join(' 或 ') : expected)
+          );
+        }
+      }
+      function hidden(id) {
+        var el = document.getElementById(id);
+        if (!el) return '__MISSING__';
+        return el.hasAttribute('data-qd-hidden') ||
+          !!el.closest('[data-qd-hidden="1"]') ||
+          getComputedStyle(el).display === 'none'
+          ? 'hidden'
+          : 'visible';
+      }
+      function ckFn(name, fn, expected) {
+        var actual;
+        try {
+          actual = fn();
+        } catch (e) {
+          actual = '__ERR__:' + e.message;
+        }
+        var ok = Array.isArray(expected) ? expected.indexOf(actual) !== -1 : actual === expected;
+        if (ok) {
+          pass++;
+          out.push('CT PASS | ' + name + ' | ' + actual);
+        } else {
+          fail++;
+          out.push('CT FAIL | ' + name + ' | ' + actual + ' | 期望 ' + (Array.isArray(expected) ? expected.join(' 或 ') : expected));
+        }
+      }
+      function finish() {
+        out.push('CT SUMMARY | pass=' + pass + ' fail=' + fail);
+        document.getElementById('report').textContent = '\n' + out.join('\n');
+        document.title = 'CT pass=' + pass + ' fail=' + fail;
+      }
+
+      setTimeout(function () {
+        var root = document.documentElement;
+
+        try {
+        ck('打上极简标记', root.getAttribute('data-qd-minimal'), 'on');
+        ck('应用存储中的主题', root.getAttribute('data-qd-theme'), 'dark');
+        ck('解析后的主题', root.getAttribute('data-qd-resolved'), 'dark');
+        ck('默认不隐藏推广位（无 data-qd-noads）', root.hasAttribute('data-qd-noads'), false);
+
+        /* ---- 真实页游入口：整体隐藏容器，而不是只藏里面的链接 ---- */
+        ck('顶部页游广告容器被整体标记隐藏', hidden('j-topOpBox'), 'hidden');
+        ck('顶部页游广告条被标记隐藏（同时压过 inline display:block）', hidden('topGameOp'), 'hidden');
+        ck('导航里的页游入口被标记隐藏', hidden('game-web'), 'hidden');
+        ck('页游下拉面板随容器一起隐藏', hidden('web-dropdown'), 'hidden');
+
+        /* ---- 通用规则仍然有效，且不误伤 ---- */
+        ck('文本「页游」入口被删', hidden('nav-webgame'), 'hidden');
+        ck('game.qidian.com 链接被删', hidden('nav-more-game'), 'hidden');
+        ck('wan.qidian.com 链接被删', hidden('nav-wan'), 'hidden');
+        ck('类名+文本命中的入口被删', hidden('game-entry-box'), 'hidden');
+        ck('「游戏竞技」分类被保留', hidden('nav-game-cat'), 'visible');
+        ck('长文本 game-news 被保留', hidden('game-news'), 'visible');
+
+        var host = document.getElementById('qd-minimal-toggle');
+        ck('悬浮按钮已挂载', !!host, true);
+        ck('悬浮按钮使用 Shadow DOM', !!(host && host.shadowRoot), true);
+        ck('悬浮按钮内置图标', host && host.shadowRoot ? host.shadowRoot.querySelectorAll('svg').length : -1, 2);
+        ckFn('悬浮按钮避让站点右下固定条（bottom/right 均为 20px）', function () {
+          var s = getComputedStyle(host.shadowRoot.querySelector('.btn'));
+          return s.bottom + '/' + s.right;
+        }, ['20px/20px']);
+
+        var mirror = null;
+        try {
+          mirror = JSON.parse(localStorage.getItem('qd_minimal_cfg') || 'null');
+        } catch (e) {
+          mirror = 'PARSE_ERROR';
+        }
+        ck('配置已镜像到 localStorage（供 early.js 零闪烁读取）', mirror && mirror.theme, 'dark');
+
+        /* ---- 点击悬浮按钮 → 切到日间并写回 storage ---- */
+        try {
+          var btn = host.shadowRoot.querySelector('.btn');
+          btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        } catch (e) {
+          out.push('CT FAIL | 点击悬浮按钮抛错 | ' + e.message);
+          fail++;
+        }
+        ck('点击后切换为日间', root.getAttribute('data-qd-theme'), 'light');
+        ck('切换已写回 storage', window.__qdStore.theme, 'light');
+
+        /* ---- 消息接口：快捷键切换 / 状态查询 / 结构导出 ---- */
+        if (window.__qdMsg) {
+          var resp = null;
+          try {
+            window.__qdMsg({ type: 'qd:toggle-theme' }, null, function (r) {
+              resp = r;
+            });
+          } catch (e) {
+            /* 忽略 */
+          }
+          ck('消息接口可响应切换', resp && resp.ok, true);
+          ck('消息接口切换回夜间', root.getAttribute('data-qd-theme'), 'dark');
+
+          var state = null;
+          window.__qdMsg({ type: 'qd:state' }, null, function (r) {
+            state = r;
+          });
+          ck('状态查询可用', state && state.ok, true);
+          ck('状态查询不谎报阅读页', state && state.reader, false);
+
+          var outline = null;
+          window.__qdMsg({ type: 'qd:outline' }, null, function (r) {
+            outline = r && r.outline;
+          });
+          ck('可导出页面结构（带 URL 头）', typeof outline === 'string' && outline.indexOf('# URL:') !== -1, true);
+          ck('导出的结构含真实 class', typeof outline === 'string' && outline.indexOf('game-web') !== -1, true);
+        } else {
+          ck('已注册消息监听', false, true);
+        }
+
+        /* ---- 关掉「移除页游入口」应能原样恢复 ---- */
+        window.__qdStore.removeGames = false;
+        window.__qdMsg({ type: 'qd:apply' }, null, function () {});
+        } catch (e) {
+          // 夹具自身的错也要显式暴露，不能静默成 RUNNING
+          fail++;
+          out.push('CT FAIL | 断言过程抛错 | ' + (e && e.message));
+        }
+
+        setTimeout(function () {
+          try {
+            ck('关闭开关后页游容器恢复', hidden('j-topOpBox'), 'visible');
+            ck('关闭开关后页游导航项恢复', hidden('game-web'), 'visible');
+            ck('恢复时清掉了所有隐藏标记', document.querySelectorAll('[data-qd-hidden]').length, 0);
+          } catch (e) {
+            fail++;
+            out.push('CT FAIL | 恢复断言抛错 | ' + (e && e.message));
+          }
+          finish();
+        }, 120);
+      }, 260);
+    </script>
+  </body>
+</html>

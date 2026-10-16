@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-qd-minimal="on" data-qd-theme="light" data-qd-nogames="on">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>起点极简 · 全部作品页离线预览（/all/）</title>
+    <link rel="stylesheet" href="../tools/site-sim.css" />
+    <link rel="stylesheet" href="../src/theme.css" />
+    <style>
+      /* 预览页自身的壳 */
+      .pv-note {
+        max-width: 1200px;
+        margin: 16px auto 0;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: #131019;
+        border: 1px dashed #3a3350;
+        color: #b5aec3;
+        font: 400 12px/1.9 -apple-system, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', system-ui, sans-serif;
+      }
+      .pv-note b { color: #e9e6f0 }
+      .pv-note code { color: #ff8b9e; font-family: 'Cascadia Code', Consolas, monospace }
+      .pv-note i { color: #ff8b9e; font-style: normal }
+      #pv-bar {
+        position: fixed; left: 20px; bottom: 20px; z-index: 2147483002;
+        display: flex; gap: 8px; align-items: center; padding: 8px 10px;
+        border-radius: 12px; background: #131019; border: 1px solid #2a2338;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        font: 500 12px/1 -apple-system, 'Segoe UI', 'Microsoft YaHei UI', system-ui, sans-serif; color: #e9e6f0;
+      }
+      #pv-bar span { color: #7f7891; padding: 0 2px }
+      #pv-theme, #pv-reset, #pv-page {
+        cursor: pointer; padding: 8px 12px; border-radius: 8px;
+        background: #211c2b; border: 1px solid #382f4a; color: #e9e6f0;
+        transition: border-color 0.15s, color 0.15s;
+      }
+      #pv-theme:hover, #pv-reset:hover, #pv-page:hover { border-color: #ff5a76; color: #ff5a76 }
+      #pv-float {
+        position: fixed; right: 20px; bottom: 20px; z-index: 2147483001;
+        width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+        border-radius: 12px; background: #fff; border: 1px solid #e4e7ec;
+        box-shadow: 0 6px 20px rgba(12, 14, 20, 0.14); color: #15171c; cursor: pointer;
+      }
+      #pv-float svg { width: 20px; height: 20px }
+      #pv-float .moon { display: none }
+      html[data-qd-theme='dark'] #pv-float { background: #171c20; border-color: #303539; color: #bec8d2 }
+      html[data-qd-theme='dark'] #pv-float .moon { display: block }
+      html[data-qd-theme='dark'] #pv-float .sun { display: none }
+      /* 预览用占位封面（真实页面是书封 webp） */
+      .pv-cover {
+        align-items: center; background: #3f4c6b; border-radius: 10px; box-sizing: border-box;
+        color: #fff; display: flex; font: 600 15px/1.4 -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        height: 136px; justify-content: center; text-align: center; width: 102px;
+      }
+    </style>
+  </head>
+
+  <body class="all">
+    <div class="wrap">
+      <!-- ==================== 顶部（与首页同构） ==================== -->
+      <div class="top-nav">
+        <div class="box-center cf">
+          <div class="nav-link fl">
+            <a class="act" href="#">起点中文网</a>
+            <a class="third-remove" href="#">起点女生网</a>
+            <em>|</em>
+            <a href="#">繁体版</a>
+          </div>
+          <div class="login-box fr"><span>你好，读者</span><a href="#">退出</a></div>
+        </div>
+      </div>
+
+      <div class="logo-wrap box-center">
+        <div class="box-center cf">
+          <div class="book-shelf fr"><a href="#"><i>我的书架</i></a></div>
+          <div class="logo fl"><a href="#">起点中文网</a></div>
+          <div class="search-wrap fl">
+            <form>
+              <p><input class="search-box" type="text" placeholder="搜索书名 / 作者" /></p>
+              <input class="submit-input" type="submit" value="搜索" />
+              <a href="#"><label class="search-btn"><em class="iconfont">🔍</em></label></a>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-nav-wrap">
+        <div class="main-nav box-center cf">
+          <ul>
+            <li class="first"><span><em><i></i><i></i><i></i></em>作品分类</span></li>
+            <li class="nav-li"><a class="act" href="#">全部作品</a></li>
+            <li class="nav-li"><a href="#">排行</a></li>
+            <li class="nav-li"><a href="#">完本</a></li>
+            <li class="nav-li"><a href="#">免费</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box-center">
+        <div class="pv-note">
+          <b>全部作品页离线预览（/all/）</b> —— 结构取自实抓的 <code>www.qidian.com/all/</code>（104KB DOM + 157KB CSS）。<br />
+          看三处：<i>①</i> 左侧「分类 / 状态 / 属性 / 字数 / 品质 / 更新时间 / 标签」的每个选项是不是都有圆弧框&nbsp;
+          <i>②</i> 右侧每本书是不是一个圆弧框、并且仍然是<b>两列</b>、封面没有被挤到下一行&nbsp;
+          <i>③</i> 中间排序按钮是否也成了圆弧框。
+        </div>
+
+        <!-- ==================== 主体：左筛选 + 右书单 ==================== -->
+        <div class="all-pro-wrap box-center cf">
+          <div class="range-sidebar fl">
+            <div class="site">
+              <a class="site-item act" href="#">男生</a>
+              <a class="site-item" href="#">女生</a>
+              <a class="site-item" href="#">出版</a>
+              <a class="site-item" href="#">听书</a>
+            </div>
+
+            <div class="selected">
+              <a class="all" href="#">全部<cite>×</cite></a>
+            </div>
+
+            <div class="select-list">
+              <div class="work-filter type-filter">
+                <h3>分类</h3>
+                <ul class="row-1">
+                  <li class="act arrow"><a href="#">全部</a><cite></cite></li>
+                  <li><a href="#">玄幻</a></li>
+                  <li><a href="#">奇幻</a></li>
+                  <li><a href="#">武侠</a></li>
+                </ul>
+                <ul class="row-2">
+                  <li><a href="#">仙侠</a></li>
+                  <li><a href="#">都市</a></li>
+                  <li><a href="#">现实</a></li>
+                  <li><a href="#">军事</a></li>
+                </ul>
+                <ul class="row-3">
+                  <li><a href="#">历史</a></li>
+                  <li><a href="#">游戏</a></li>
+                  <li><a href="#">体育</a></li>
+                  <li><a href="#">科幻</a></li>
+                </ul>
+                <ul class="row-4">
+                  <li><a href="#">诸天无限</a></li>
+                  <li><a href="#">悬疑灵异</a></li>
+                  <li><a href="#">轻小说</a></li>
+                  <li><a href="#">短篇</a></li>
+                </ul>
+              </div>
+
+              <div class="work-filter action-filter">
+                <h3>状态</h3>
+                <ul>
+                  <li class="act"><a href="#">全部</a></li>
+                  <li><a href="#">连载</a></li>
+                  <li><a href="#">完本</a></li>
+                </ul>
+              </div>
+
+              <div class="work-filter vip-filter">
+                <h3>属性</h3>
+                <ul>
+                  <li class="act"><a href="#">全部</a></li>
+                  <li><a href="#">免费</a></li>
+                  <li><a href="#">VIP</a></li>
+                </ul>
+              </div>
+
+              <div class="work-filter">
+                <h3>字数</h3>
+                <ul>
+                  <li class="act"><a href="#">全部</a></li>
+                  <li><a href="#">30万字以下</a></li>
+                  <li><a href="#">30-50万字</a></li>
+                  <li><a href="#">50-100万字</a></li>
+                  <li><a href="#">100-200万字</a></li>
+                  <li><a href="#">200万字以上</a></li>
+                </ul>
+              </div>
+
+              <div class="work-filter">
+                <h3>品质</h3>
+                <ul>
+                  <li class="act"><a href="#">全部</a></li>
+                  <li><a href="#">签约作品</a></li>
+                  <li><a href="#">精品小说</a></li>
+                </ul>
+              </div>
+
+              <div class="work-filter">
+                <h3>更新时间</h3>
+                <ul>
+                  <li class="act"><a href="#">全部</a></li>
+                  <li><a href="#">三日内</a></li>
+                  <li><a href="#">七日内</a></li>
+                  <li><a href="#">半月内</a></li>
+                  <li><a href="#">一月内</a></li>
+                </ul>
+              </div>
+
+              <div class="work-filter tag">
+                <h3>标签</h3>
+                <ul>
+                  <li class="act"><a href="#">全部</a></li>
+                  <li><a href="#">升级流</a></li>
+                  <li><a href="#">无敌流</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="main-content-wrap fl">
+            <div class="tool-bar cf">
+              <div class="select-wrap">
+                <a class="act" href="#">人气排序<cite class="iconfont">↓</cite></a>
+                <a href="#">总收藏</a>
+                <a href="#">总字数</a>
+                <a href="#">推荐票</a>
+                <a href="#">月票</a>
+              </div>
+              <div class="sort-count count-info"><div class="count-text">共 <span>1097614</span> 本相关作品</div></div>
+            </div>
+
+            <div class="all-book-list">
+              <div class="book-img-text">
+                <ul class="all-img-list cf">                  <li>
+                    <div class="book-img-box"><a href="#"><span class="pv-cover">夜无疆</span></a></div>
+                    <div class="book-mid-info">
+                      <h2><a href="#"><cite class="red-kw">夜</cite>无疆</a></h2>
+                      <p class="author"><a class="name" href="#">辰东</a><i>·</i><span>玄幻 · 东方玄幻 · 连载</span></p>
+                      <p class="intro">那一天太阳落下再也没有升起………………</p>
+                      <p class="update">415.98万字 <i>|</i> <a href="#">第846章 大可不必</a></p>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="book-img-box"><a href="#"><span class="pv-cover">玄鉴仙族</span></a></div>
+                    <div class="book-mid-info">
+                      <h2><a href="#">玄鉴仙族</a></h2>
+                      <p class="author"><a class="name" href="#">季越人</a><i>·</i><span>仙侠 · 修真文明 · 连载</span></p>
+                      <p class="intro">陆江仙熬夜猝死，残魂却附在了一面满是裂痕的青灰色铜镜上。</p>
+                      <p class="update">641.63万字 <i>|</i> <a href="#">第一千六百二十七章 推演</a></p>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="book-img-box"><a href="#"><span class="pv-cover">没钱修<br />什么仙？</span></a></div>
+                    <div class="book-mid-info">
+                      <h2><a href="#">没钱修什么仙？</a></h2>
+                      <p class="author"><a class="name" href="#">熊狼狗</a><i>·</i><span>仙侠 · 修真文明 · 连载</span></p>
+                      <p class="intro">老者：“你想报仇？！”少年：“我被强者反复侮辱，被师尊视为垃圾。”</p>
+                      <p class="update">424.8万字 <i>|</i> <a href="#">第1018章 后有来者</a></p>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="book-img-box"><a href="#"><span class="pv-cover">青山</span></a></div>
+                    <div class="book-mid-info">
+                      <h2><a href="#">青山</a></h2>
+                      <p class="author"><a class="name" href="#">会说话的胡子</a><i>·</i><span>玄幻 · 东方玄幻 · 连载</span></p>
+                      <p class="intro">当今名利已斩天下九分侠气，诸位，这是天下最后一份侠气的故事。</p>
+                      <p class="update">274.6万字 <i>|</i> <a href="#">第840章 无人试剑</a></p>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="book-img-box"><a href="#"><span class="pv-cover">剑烛大荒</span></a></div>
+                    <div class="book-mid-info">
+                      <h2><a href="#">剑烛大荒</a></h2>
+                      <p class="author"><a class="name" href="#">爱潜水的乌贼</a><i>·</i><span>玄幻 · 东方玄幻 · 连载</span></p>
+                      <p class="intro">“烛龙，食之开浑沌、照九阴、掌昼夜、更替四时、呼唤风雨。”</p>
+                      <p class="update">82.95万字 <i>|</i> <a href="#">第八十一章 身意冥宗</a></p>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="book-img-box"><a href="#"><span class="pv-cover">异度旅社</span></a></div>
+                    <div class="book-mid-info">
+                      <h2><a href="#">异度旅社</a></h2>
+                      <p class="author"><a class="name" href="#">远瞳</a><i>·</i><span>科幻 · 时空穿梭 · 连载</span></p>
+                      <p class="intro">在日常之下，在理性尽头，在你所熟悉的世界之外——是你从未想象过的风景。</p>
+                      <p class="update">294.01万字 <i>|</i> <a href="#">第133章 快速落户</a></p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== 分页 ==================== -->
+        <div class="page-box cf">
+          <div class="pagination fr">
+            <div class="lbf-pagination">
+              <ul class="lbf-pagination-item-list">
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-prev lbf-pagination-disabled">&lt;</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-page lbf-pagination-current">1</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-page">2</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-page">3</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-page">4</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-page">...</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-page">20</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-page">21</a></li>
+                <li class="lbf-pagination-item"><a href="#" class="lbf-pagination-next">下一页</a></li>
+              </ul>
+              <div class="lbf-pagination-jump">
+                <input class="lbf-pagination-input" type="text" value="1" />
+                <a href="#" class="lbf-pagination-go">确定</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== 本周热推 ==================== -->
+        <div class="weekly-hot-rec">
+          <div class="box-center cf">
+            <span class="title">本周热推:</span>
+            <div class="book-name-container">
+              <a class="book-item" href="#">尘骨小说</a>
+              <a class="book-item" href="#">我的功法无限提升最新章节</a>
+              <a class="book-item" href="#">夜无疆</a>
+              <a class="book-item" href="#">玄鉴仙族</a>
+              <a class="book-item" href="#">诡秘之主</a>
+              <a class="book-item" href="#">青山</a>
+              <a class="book-item" href="#">剑烛大荒</a>
+              <a class="book-item" href="#">异度旅社</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer box-center">
+          <div class="box-center cf">
+            <div class="footer-menu"><a href="#">关于我们</a><a href="#">联系方式</a><a href="#">隐私政策</a></div>
+            <div class="copy-right"><p>© 起点中文网 · 离线预览页</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-bottom-fixed">
+      <div class="page-bottom-item"><a class="item-link-txt" href="#"><span class="txt">我的书架</span></a></div>
+      <div class="page-bottom-item"><a class="item-link-txt" href="#"><span class="txt">桌面版</span></a></div>
+      <div class="page-bottom-item"><a class="item-link-txt" href="#"><span class="txt">顶部</span></a></div>
+    </div>
+
+    <div id="pv-float" title="扩展注入的日夜切换按钮（示例）">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4.2" />
+        <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2" />
+        <path d="M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6" />
+      </svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5z" />
+      </svg>
+    </div>
+
+    <div id="pv-bar">
+      <span>预览</span>
+      <div id="pv-theme">切换到夜间</div>
+      <div id="pv-reset">重置</div>
+      <div id="pv-page" title="打开首页预览">首页预览 ↗</div>
+    </div>
+
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var btn = document.getElementById('pv-theme');
+        function sync() {
+          btn.textContent = root.getAttribute('data-qd-theme') === 'dark' ? '切换到日间' : '切换到夜间';
+        }
+        function flip() {
+          root.setAttribute('data-qd-theme', root.getAttribute('data-qd-theme') === 'dark' ? 'light' : 'dark');
+          sync();
+        }
+        btn.addEventListener('click', flip);
+        document.getElementById('pv-float').addEventListener('click', flip);
+        document.getElementById('pv-reset').addEventListener('click', function () {
+          root.setAttribute('data-qd-theme', 'light');
+          sync();
+        });
+        document.getElementById('pv-page').addEventListener('click', function () {
+          location.href = 'preview.html';
+        });
+        sync();
+      })();
+    </script>
+  </body>
+</html>

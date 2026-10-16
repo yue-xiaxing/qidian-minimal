@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-qd-minimal="on" data-qd-theme="light" data-qd-nogames="on">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>起点极简 · 离线预览（真实结构）</title>
+
+    <!-- 站点样式模拟（相当于站点自己的 CSS） -->
+    <link rel="stylesheet" href="../tools/site-sim.css" />
+    <!-- 扩展真实样式表（document_end 注入，顺序在后） -->
+    <link rel="stylesheet" href="../src/theme.css" />
+
+    <style>
+      /* 仅预览页自身的壳，不属于扩展样式 */
+      .pv-note {
+        max-width: 1200px;
+        margin: 16px auto 0;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: #131019;
+        border: 1px dashed #3a3350;
+        color: #b5aec3;
+        font: 400 12px/1.9 -apple-system, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', system-ui, sans-serif;
+      }
+      .pv-note b { color: #e9e6f0 }
+      .pv-note code { color: #ff8b9e; font-family: 'Cascadia Code', Consolas, monospace }
+      .pv-note i { color: #ff8b9e; font-style: normal }
+
+      /* 预览页的夜间开关（挪到左下，避免和扩展按钮位置混淆） */
+      #pv-bar {
+        position: fixed;
+        left: 20px;
+        bottom: 20px;
+        z-index: 2147483002;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: #131019;
+        border: 1px solid #2a2338;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        font: 500 12px/1 -apple-system, 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', system-ui, sans-serif;
+        color: #e9e6f0;
+      }
+      #pv-bar span { color: #7f7891; padding: 0 2px }
+      #pv-theme,
+      #pv-reset {
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: #211c2b;
+        border: 1px solid #382f4a;
+        color: #e9e6f0;
+        transition: border-color 0.15s, color 0.15s;
+      }
+      #pv-theme:hover,
+      #pv-reset:hover { border-color: #ff5a76; color: #ff5a76 }
+
+      /* 模拟扩展的悬浮日/夜按钮：线上由 content.js 用 Shadow DOM 注入，
+         位置 right:20px / bottom:20px，正好落在站点 .page-bottom-fixed（bottom:64px 起）下方 */
+      #pv-float {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 2147483001;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid #e4e7ec;
+        box-shadow: 0 6px 20px rgba(12, 14, 20, 0.14);
+        color: #15171c;
+        cursor: pointer;
+      }
+      #pv-float svg { width: 20px; height: 20px }
+      #pv-float .moon { display: none }
+      html[data-qd-theme='dark'] #pv-float { background: #131019; border-color: #2a2338; color: #e9e6f0 }
+      html[data-qd-theme='dark'] #pv-float .moon { display: block }
+      html[data-qd-theme='dark'] #pv-float .sun { display: none }
+      .pv-covers { display: flex; gap: 18px; padding: 8px 0 0 }
+      .pv-cover {
+        width: 100px;
+        height: 133px;
+        border-radius: 6px;
+        border: 1px solid #dfe3e9;
+        background: #3f4c6b;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 8px;
+        box-sizing: border-box;
+        font: 600 13px/1.4 -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      }
+    </style>
+  </head>
+
+  <body class="index">
+    <div class="wrap">
+      <!-- ==================== 顶部工具条 ==================== -->
+      <div class="top-nav">
+        <div class="box-center cf">
+          <div class="nav-link fl">
+            <a class="act" href="#">起点中文网</a>
+            <a class="third-remove" href="#">起点女生网</a>
+            <em>|</em>
+            <a id="switchEl" href="#">繁体版</a>
+          </div>
+          <div class="login-box fr">
+            <span>你好，读者</span>
+            <a href="#">退出</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 顶部随机广告 = 页游入口（应被移除） ==================== -->
+      <div class="top-op-box" id="j-topOpBox">
+        <div class="top-game-op" id="topGameOp" style="display: block">
+          <div class="game-wrap">
+            <a class="close" id="closeTopGame" href="#"><em class="iconfont">×</em></a>
+            <a href="https://game.qidian.com/" style="display:block;height:60px;background:#2c3a55;color:#fff;font:600 20px/60px sans-serif;text-align:center">
+              这里是「顶部随机广告 · 页游入口」（扩展会整条移除，不留空白带）
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 品牌行 + 搜索 ==================== -->
+      <div class="logo-wrap box-center">
+        <div class="box-center cf">
+          <div class="book-shelf fr">
+            <a id="numero2" href="#"><i>我的书架</i></a>
+          </div>
+          <div class="logo fl"><a href="#">起点中文网</a></div>
+          <div class="search-wrap fl">
+            <form id="formUrl">
+              <p><input id="s-box" class="search-box" type="text" placeholder="搜索书名 / 作者" /></p>
+              <input id="searchSubmit" class="submit-input" type="submit" value="搜索" />
+              <a href="#"><label id="search-btn" class="search-btn"><em class="iconfont">🔍</em></label></a>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 主导航（原为 #3e3d43 深灰底白字） ==================== -->
+      <div class="main-nav-wrap">
+        <div class="main-nav box-center cf">
+          <ul>
+            <li class="first"><span><em><i></i><i></i><i></i></em>作品分类</span></li>
+            <li class="nav-li"><a href="#">全部作品</a></li>
+            <li class="nav-li"><a class="act" href="#">排行</a></li>
+            <li class="nav-li"><a href="#">完本</a></li>
+            <li class="nav-li"><a href="#">免费</a></li>
+            <li class="nav-li"><a href="#">作家专区</a></li>
+            <!-- 页游入口（导航里，应被移除） -->
+            <li class="game web" id="game-web">
+              <a class="web-game" href="https://game.qidian.com/"><b class="iconfont"></b>页游</a>
+              <div class="game-dropdown hidden" id="web-dropdown"><cite></cite><div class="web-game-list"></div></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box-center">
+        <div class="pv-note">
+          <b>离线预览（真实结构）</b> —— 这一屏用的是实抓 <code>www.qidian.com</code> 首页的 DOM 结构 +
+          站点样式模拟 + 扩展真实的 <code>src/theme.css</code>，所以效果与线上一致。<br />
+          请重点看：<i>①</i> 顶部那条「页游入口」广告带是否已经整条消失（不留空白）&nbsp;
+          <i>②</i> 导航里的「页游」项是否消失，其余项是否<b>可读</b>（上一版把这里染成了深灰，看不见）&nbsp;
+          <i>③</i> 导航条是否变成干净的浅色条&nbsp; <i>④</i> 书单三栏是否仍是 216px 宽的紧凑文字榜（不能被撑成网格）<br />
+          左下角是预览的日/夜开关；右下角那个方形按钮是扩展的悬浮切换键（线上由 content.js 注入）。
+        </div>
+
+        <!-- ==================== 书单三栏 + 广告位 ==================== -->
+        <div class="index-two-wrap box-center mb40 cf">
+          <div class="book-list-wrap mr30 fl">
+            <h3 class="wrap-title lang">热门推荐<a class="more" href="#"><em class="iconfont">›</em></a></h3>
+            <div class="book-list">
+              <ul>
+                <li class="color-type_1">
+                  <a class="channel" href="#"><em>[仙侠]</em></a>
+                  <strong><a class="name" href="#">凡人修仙传</a><cite class="hot"></cite></strong>
+                  <a class="author" href="#">忘语</a>
+                </li>
+                <li>
+                  <a class="channel" href="#"><em>[奇幻]</em></a>
+                  <strong><a class="name" href="#">诡秘之主</a></strong>
+                  <a class="author" href="#">爱潜水的乌贼</a>
+                </li>
+                <li>
+                  <a class="channel" href="#"><em>[仙侠]</em></a>
+                  <strong><a class="name" href="#">大奉打更人</a></strong>
+                  <a class="author" href="#">卖报小郎君</a>
+                </li>
+                <li>
+                  <a class="channel" href="#"><em>[都市]</em></a>
+                  <strong><a class="name" href="#">深空彼岸</a></strong>
+                  <a class="author" href="#">辰东</a>
+                </li>
+                <li>
+                  <a class="channel" href="#"><em>[历史]</em></a>
+                  <strong><a class="name" href="#">穷鬼的上下两千年</a></strong>
+                  <a class="author" href="#">非玩家角色</a>
+                </li>
+                <li>
+                  <a class="channel" href="#"><em>[科幻]</em></a>
+                  <strong><a class="name" href="#">全民魔女1994</a></strong>
+                  <a class="author" href="#">宇宙鸽</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="book-list-wrap fr">
+            <h3 class="wrap-title lang">新书推荐<a class="more" href="#"><em class="iconfont">›</em></a></h3>
+            <div class="book-list">
+              <ul>
+                <li>
+                  <a class="channel" href="#"><em>[轻小说]</em></a>
+                  <strong><a class="name" href="#">不当妈妈可以吗</a></strong>
+                  <a class="author" href="#">系星兔</a>
+                </li>
+                <li>
+                  <a class="channel" href="#"><em>[轻小说]</em></a>
+                  <strong><a class="name" href="#">二周目魔法少女</a></strong>
+                  <a class="author" href="#">星夜奔行鼠</a>
+                </li>
+                <li>
+                  <a class="channel" href="#"><em>[仙侠]</em></a>
+                  <strong><a class="name" href="#">崔更，然后变成魔法少女</a></strong>
+                  <a class="author" href="#">绽放之樱</a>
+                </li>
+                <li>
+                  <a class="channel" href="#"><em>[历史]</em></a>
+                  <strong><a class="name" href="#">奥特曼：身为客串</a></strong>
+                  <a class="author" href="#">不是梨子</a>
+                </li>
+                <li>
+                  <a class="channel" href="#"><em>[科幻]</em></a>
+                  <strong><a class="name" href="#">下班，然后变成魔法少女</a></strong>
+                  <a class="author" href="#">弧盐</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== 榜单 ==================== -->
+        <div class="rank-wrap box-center mb20">
+          <div id="numero3">
+            <div class="rank-list">
+              <div class="book-list">
+                <ul>
+                  <li>
+                    <div class="num-box"><span class="num1">1</span></div>
+                    <div class="name-box"><a class="name" href="#">凡人修仙传</a><i class="total">1234</i></div>
+                  </li>
+                  <li>
+                    <div class="num-box"><span class="num2">2</span></div>
+                    <div class="name-box"><a class="name" href="#">诡秘之主</a><i class="total">1102</i></div>
+                  </li>
+                  <li>
+                    <div class="num-box"><span class="num3">3</span></div>
+                    <div class="name-box"><a class="name" href="#">大奉打更人</a><i class="total">980</i></div>
+                  </li>
+                  <li>
+                    <div class="num-box"><span>4</span></div>
+                    <div class="name-box"><a class="name" href="#">深空彼岸</a><i class="total">901</i></div>
+                  </li>
+                  <li>
+                    <div class="num-box"><span>5</span></div>
+                    <div class="name-box"><a class="name" href="#">宿命之环</a><i class="total">877</i></div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 筛选搜索条 ==================== -->
+      <div class="filter-search-wrap">
+        <div class="box-center cf">
+          <div class="filter-search-box cf">
+            <span class="title">作品分类</span>
+            <div class="filter-search"><a class="red-btn" href="#">搜索</a></div>
+          </div>
+          <div class="everyone">
+            <span class="title">热搜</span>
+            <div class="key-words"><a href="#">凡人</a><a href="#">诡秘</a></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 页脚 ==================== -->
+      <div class="footer">
+        <div class="box-center cf">
+          <div class="footer-menu">
+            <a href="#">关于我们</a><a href="#">联系方式</a><a href="#">用户协议</a><a href="#">隐私政策</a><a href="#">商务合作</a><a href="#">帮助中心</a>
+          </div>
+          <div class="copy-right"><p><a href="#">举报中心</a> © 起点中文网 · 离线预览页</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 站点右下固定条 ==================== -->
+    <div class="page-bottom-fixed" id="pageBottmOprate">
+      <div class="page-bottom-item">
+        <a id="bookShelf" class="item-link-txt" href="#"><em class="iconfont icon-shelf">▤</em><span class="txt">我的书架</span></a>
+      </div>
+      <div class="page-bottom-item">
+        <a class="go-qrcode jsFixedCode" href="#"><span class="loop loop1"><em class="icon icon-code">▣</em><p class="icon-txt">扫码</p></span></a>
+      </div>
+      <div class="page-bottom-item">
+        <a id="bottomDeskDownload" class="go-windows item-link-txt" href="#"><span class="txt">桌面版</span></a>
+      </div>
+      <div class="page-bottom-item" id="pageBottomGoTop">
+        <a class="go-top" href="#"><span class="txt">顶部</span></a>
+      </div>
+    </div>
+
+    <!-- ==================== 模拟扩展的悬浮日/夜按钮 ==================== -->
+    <div id="pv-float" title="这是扩展注入的日夜切换按钮（示例）">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="12" cy="12" r="4.2" />
+        <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2" />
+        <path d="M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6" />
+      </svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5z" />
+      </svg>
+    </div>
+
+    <!-- ==================== 预览控制条 ==================== -->
+    <div id="pv-bar">
+      <span>预览</span>
+      <div id="pv-theme">切换到夜间</div>
+      <div id="pv-reset">重置</div>
+    </div>
+
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var btn = document.getElementById('pv-theme');
+        var reset = document.getElementById('pv-reset');
+
+        function sync() {
+          var dark = root.getAttribute('data-qd-theme') === 'dark';
+          btn.textContent = dark ? '切换到日间' : '切换到夜间';
+        }
+
+        function flip() {
+          root.setAttribute('data-qd-theme', root.getAttribute('data-qd-theme') === 'dark' ? 'light' : 'dark');
+          sync();
+        }
+
+        btn.addEventListener('click', flip);
+        document.getElementById('pv-float').addEventListener('click', flip);
+        reset.addEventListener('click', function () {
+          root.setAttribute('data-qd-theme', 'light');
+          sync();
+        });
+        sync();
+      })();
+    </script>
+  </body>
+</html>

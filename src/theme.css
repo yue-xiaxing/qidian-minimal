@@ -1,0 +1,2313 @@
+/*!
+ * 起点极简 · theme.css   v1.1.0
+ * ---------------------------------------------------------------------------
+ * 作用域：每一条规则都收在 html[data-qd-minimal="on"] 之下；阅读页（/chapter/、
+ *        read.、vipreader.）在 manifest 层就被排除，脚本与样式都不会注入。
+ *
+ * 选择器来源：2026-10 实抓 www.qidian.com 首页 DOM（232KB）+ 站点主样式表（189KB），
+ *        不是猜的。已知结构：
+ *          .top-nav            顶部工具条（35px，#f7f7f7）
+ *          .logo-wrap          品牌行（84px，logo + .search-wrap + .book-shelf）
+ *          .main-nav-wrap/.main-nav   主导航（40px，#3e3d43 深灰底白字）
+ *          .pin-nav-wrap       吸顶导航（42px，#3e3d43，JS 控制 .show）
+ *          .book-list-wrap     首页书单三栏（216px 宽、31px 行高的紧凑文字榜）
+ *          .edit-rec-wrap/.book-list-wrap(.fr)  编辑推荐
+ *          .focus-wrap         焦点图 + 公告 + 右侧广告位
+ *          .hot-work-wrap/.hot-classify-wrap   热门作品 / 热门分类
+ *          .new-rec-wrap/.finish-book-wrap/.update-wrap/.time-limit-wrap
+ *          .filter-search-wrap 筛选搜索条（#f2f2f2）
+ *          .rank-wrap          榜单（.rank-list .book-list li .num-box span.num1/2/3）
+ *          .footer             页脚（#fafafa）
+ *          .page-bottom-fixed  右下固定条（64×64 卡片）
+ *          #topGameOp(.top-game-op)  顶部随机广告 = 页游入口
+ *          li#game-web.game.web      导航里的「页游」入口
+ *
+ * 设计语言：现代几何极简 —— 0 渐变、0 阴影堆叠、1px 发丝线 + 留白分层、
+ *          统一圆角刻度、单一强调色、系统中文字体栈。
+ * ---------------------------------------------------------------------------
+ */
+
+/* ========================================================================
+ * 1. 设计令牌 —— 日间
+ * ===================================================================== */
+html[data-qd-minimal='on'] {
+  color-scheme: light;
+
+  --qd-accent: #e03e52;
+  --qd-accent-hover: #c93347;
+  --qd-accent-soft: rgba(224, 62, 82, 0.1);
+  --qd-accent-line: rgba(224, 62, 82, 0.34);
+
+  --qd-bg: #f4f5f7;
+  --qd-bg-2: #eceef2;
+  --qd-surface: #ffffff;
+  --qd-surface-2: #f7f8fa;
+  --qd-surface-3: #eef0f4;
+  --qd-header-bg: rgba(255, 255, 255, 0.9);
+
+  --qd-border: #e4e7ec;
+  --qd-border-2: #d5dae2;
+
+  --qd-text: #15171c;
+  --qd-text-2: #4b5261;
+  --qd-text-3: #8a92a1;
+
+  --qd-shadow-1: 0 1px 2px rgba(17, 20, 26, 0.05);
+  --qd-shadow-2: 0 10px 28px rgba(17, 20, 26, 0.1);
+  --qd-focus: 0 0 0 3px rgba(224, 62, 82, 0.18);
+
+  --qd-r-xs: 4px;
+  --qd-r-sm: 6px;
+  --qd-r-md: 10px;
+  --qd-r-lg: 14px;
+  --qd-r-pill: 999px;
+  /* 「圆弧外框」统一圆角：按钮 / 书目 / 卡片共用（见第 22 节） */
+  --qd-r-box: 12px;
+
+  /* 书架标签列宽：默认 0，运行时由 content.js 的 syncCoverTagWidth() 量出
+   * 「当前页面最长标签的自然宽度」后覆盖 —— 刻意不写死数值，
+   * 这样任何作品、任何长度的分类标签都能对齐（见第 26 节）。 */
+  --qd-tag-w: 0px;
+
+  --qd-w: 1200px;
+
+  --qd-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei UI',
+    'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', system-ui, sans-serif;
+
+  --qd-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* 原生控件（复选框 / 进度条）跟随强调色 */
+  accent-color: var(--qd-accent);
+}
+
+/* ========================================================================
+ * 2. 设计令牌 —— 夜间
+ *    框内 / 框线 / 字色为指定值：#171C20 / #303539 / #BEC8D2
+ *    页面底色保留「偏紫的近黑」；次级文字由 #BEC8D2 逐级压暗派生
+ * ===================================================================== */
+html[data-qd-minimal='on'][data-qd-theme='dark'] {
+  color-scheme: dark;
+
+  --qd-accent: #ff5a76;
+  --qd-accent-hover: #ff7a90;
+  --qd-accent-soft: rgba(255, 90, 118, 0.15);
+  --qd-accent-line: rgba(255, 90, 118, 0.44);
+
+  --qd-bg: #0b0910;
+  --qd-bg-2: #101418;
+  --qd-surface: #171c20;
+  --qd-surface-2: #1b2126;
+  --qd-surface-3: #21282e;
+  --qd-header-bg: rgba(11, 9, 16, 0.9);
+
+  --qd-border: #303539;
+  --qd-border-2: #3d4348;
+
+  --qd-text: #bec8d2;
+  --qd-text-2: #a3aebb;
+  --qd-text-3: #7c8894;
+
+  --qd-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --qd-shadow-2: 0 12px 30px rgba(0, 0, 0, 0.55);
+  --qd-focus: 0 0 0 3px rgba(255, 90, 118, 0.22);
+}
+
+/* ========================================================================
+ * 3. 设计令牌 —— 夜间（跟随系统）
+ *    与第 2 节完全一致；自定义属性无法在同一处复用，故两份
+ * ===================================================================== */
+@media (prefers-color-scheme: dark) {
+  html[data-qd-minimal='on'][data-qd-theme='auto'] {
+    color-scheme: dark;
+
+    --qd-accent: #ff5a76;
+    --qd-accent-hover: #ff7a90;
+    --qd-accent-soft: rgba(255, 90, 118, 0.15);
+    --qd-accent-line: rgba(255, 90, 118, 0.44);
+
+    --qd-bg: #0b0910;
+    --qd-bg-2: #101418;
+    --qd-surface: #171c20;
+    --qd-surface-2: #1b2126;
+    --qd-surface-3: #21282e;
+    --qd-header-bg: rgba(11, 9, 16, 0.9);
+
+    --qd-border: #303539;
+    --qd-border-2: #3d4348;
+
+    --qd-text: #bec8d2;
+    --qd-text-2: #a3aebb;
+    --qd-text-3: #7c8894;
+
+    --qd-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --qd-shadow-2: 0 12px 30px rgba(0, 0, 0, 0.55);
+    --qd-focus: 0 0 0 3px rgba(255, 90, 118, 0.22);
+  }
+}
+
+/* ========================================================================
+ * 4. 基础层
+ *    只做「底色 / 字色 / 字体 / 线」四件事，不做任何宽度、浮动、display 覆盖，
+ *    因此不会动到站点的多栏浮动布局。
+ *
+ *    ⚠ 页面底色只设在 body、**绝不给 html 设背景**：
+ *      CSS 规定「若根元素 html 没有背景，则 body 的背景会传播到画布，且 body
+ *      自身不再绘制该背景」。站点大量使用负层级装饰层（例如书籍详情页首屏的
+ *      #gradient / #bg-left / #bg-right 都是 z-index:-9 / -10），这些层绘制在
+ *      「负层级」阶段；而 body 的背景属于普通块级背景，绘制在负层级**之后**。
+ *      一旦给 html 设了背景，传播被禁用 → body 背景真的会被绘制 → 整片负层级
+ *      装饰层（详情页首屏的浅色玻璃背景）被盖住，页面看起来发黑。
+ *      实测证据：详情页首屏采样从 (248,247,252) 变成 (10,9,17)。
+ * ===================================================================== */
+html[data-qd-minimal='on'] body {
+  background: var(--qd-bg) !important;
+  color: var(--qd-text) !important;
+  font-family: var(--qd-font) !important;
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html[data-qd-minimal='on'] h1,
+html[data-qd-minimal='on'] h2,
+html[data-qd-minimal='on'] h3,
+html[data-qd-minimal='on'] h4 {
+  letter-spacing: 0.2px;
+  text-shadow: none !important;
+}
+
+html[data-qd-minimal='on'] p {
+  line-height: 1.75 !important;
+}
+
+html[data-qd-minimal='on'] img {
+  vertical-align: middle;
+  border-style: none;
+}
+
+html[data-qd-minimal='on'] hr {
+  border: 0 !important;
+  border-top: 1px solid var(--qd-border) !important;
+  background: none !important;
+}
+
+html[data-qd-minimal='on'] ::selection {
+  background: var(--qd-accent-soft);
+  color: var(--qd-text);
+}
+
+/* 细滚动条 */
+html[data-qd-minimal='on'] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html[data-qd-minimal='on'] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+html[data-qd-minimal='on'] ::-webkit-scrollbar-thumb {
+  background: var(--qd-border-2);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: var(--qd-r-pill);
+}
+html[data-qd-minimal='on'] ::-webkit-scrollbar-thumb:hover {
+  background: var(--qd-text-3);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* 表单控件：只统一「圆角 / 线 / 字体」，不改尺寸与宽度 */
+html[data-qd-minimal='on'] input,
+html[data-qd-minimal='on'] textarea,
+html[data-qd-minimal='on'] select,
+html[data-qd-minimal='on'] button {
+  font-family: var(--qd-font) !important;
+}
+
+html[data-qd-minimal='on'] textarea,
+html[data-qd-minimal='on'] select,
+html[data-qd-minimal='on'] input[type='password'],
+html[data-qd-minimal='on'] input[type='email'],
+html[data-qd-minimal='on'] input[type='number'] {
+  background: var(--qd-surface-2) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-sm) !important;
+  color: var(--qd-text) !important;
+  box-shadow: none !important;
+}
+
+html[data-qd-minimal='on'] textarea:focus,
+html[data-qd-minimal='on'] select:focus,
+html[data-qd-minimal='on'] input:focus {
+  outline: none !important;
+  border-color: var(--qd-accent) !important;
+  box-shadow: var(--qd-focus) !important;
+}
+
+/* 按钮：只统一圆角与字重，背景/图片交给各模块精确规则（避免打散雪碧图按钮） */
+html[data-qd-minimal='on'] button,
+html[data-qd-minimal='on'] input[type='button'],
+html[data-qd-minimal='on'] input[type='submit'],
+html[data-qd-minimal='on'] input[type='reset'] {
+  border-radius: var(--qd-r-sm) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  transition: background-color 0.16s var(--qd-ease), border-color 0.16s var(--qd-ease),
+    color 0.16s var(--qd-ease), opacity 0.16s var(--qd-ease);
+}
+
+/* 主色按钮（.red-btn / .search-btn 等）的实心底色已取消：
+ * 统一改为「圆弧外框 + 纤细线」的按钮样式，见第 22 节。
+ * 强调色改为在悬浮 / 按下时出现，保证按钮在页面里依然找得到。 */
+
+/* ========================================================================
+ * 5. 顶部工具条 .top-nav（起|女|繁 + 登录态）
+ * ===================================================================== */
+html[data-qd-minimal='on'] .top-nav,
+html[data-qd-minimal='on'] .top-nav .box-center {
+  background: var(--qd-surface) !important;
+  border-bottom: 1px solid var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .top-nav a,
+html[data-qd-minimal='on'] .top-nav em,
+html[data-qd-minimal='on'] .top-nav .login-box span,
+html[data-qd-minimal='on'] .top-nav .login-box a,
+html[data-qd-minimal='on'] .top-nav .sign-in span {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .top-nav a:hover,
+html[data-qd-minimal='on'] .top-nav .login-box a:hover {
+  color: var(--qd-accent) !important;
+}
+
+/* 当前站点：去掉旧的白底描边块，换成底部 2px 强调线 */
+html[data-qd-minimal='on'] .top-nav a.act {
+  background: transparent !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  color: var(--qd-text) !important;
+  font-weight: 600 !important;
+  position: relative;
+}
+
+html[data-qd-minimal='on'] .top-nav a.act::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 0;
+  height: 2px;
+  background: var(--qd-accent);
+  border-radius: 2px 2px 0 0;
+}
+
+/* ========================================================================
+ * 6. 品牌行 + 搜索 .logo-wrap / .search-wrap / .book-shelf
+ *    只改配色与圆角，不动 348px 的输入框宽度（避免拆掉站点拼合式搜索框）
+ * ===================================================================== */
+/* 品牌行：真实页面上这一行同时带 .box-center，站点 CSS 里 .box-center{width:1200px}
+ * 排在 .logo-wrap{width:100%} 之后 → 这一行**实际只有 1200px 宽**。
+ * 若直接给它背景色，左右两侧就会露出页面底色（1200px 之外是一块黑）。
+ * 解法：元素自身铺底色 + 超大 box-shadow 把盒子**外侧**也铺满，再用 clip-path 裁成
+ * 这一行的水平条带。注意两者缺一不可——box-shadow 不会画在元素盒子内部。
+ * 底部发丝线同理改用伪元素铺满整行（元素自身的 border 只有 1200px 宽）。 */
+html[data-qd-minimal='on'][data-qd-home='1'] .logo-wrap {
+  position: relative;
+  background: var(--qd-surface) !important;
+  border-bottom: 0 !important;
+  box-shadow: 0 0 0 100vmax var(--qd-surface) !important;
+  clip-path: inset(0 -100vmax);
+}
+
+html[data-qd-minimal='on'][data-qd-home='1'] .logo-wrap::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100vw;
+  height: 1px;
+  margin-left: -50vw;
+  background: var(--qd-border);
+  pointer-events: none;
+}
+
+html[data-qd-minimal='on'] .logo-wrap .search-wrap p {
+  background: var(--qd-surface-2) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-right: 0 !important;
+  border-radius: var(--qd-r-box) 0 0 var(--qd-r-box) !important;
+  box-shadow: none !important;
+  transition: border-color 0.16s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .logo-wrap .search-wrap p:hover {
+  border-color: var(--qd-border-2) !important;
+}
+
+html[data-qd-minimal='on'] .logo-wrap .search-wrap .search-box {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .logo-wrap .search-wrap p:focus-within {
+  border-color: var(--qd-accent) !important;
+  box-shadow: var(--qd-focus) !important;
+}
+
+html[data-qd-minimal='on'] .logo-wrap .search-wrap p:focus-within .search-box {
+  box-shadow: none !important;
+}
+
+html[data-qd-minimal='on'] .logo-wrap .search-wrap .search-btn {
+  background: var(--qd-surface) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-left: 0 !important;
+  border-radius: 0 var(--qd-r-box) var(--qd-r-box) 0 !important;
+  transition: background-color 0.16s var(--qd-ease), border-color 0.16s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .logo-wrap .search-wrap .search-btn em {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .logo-wrap .search-wrap .search-btn:hover {
+  background: var(--qd-accent-soft) !important;
+  border-color: var(--qd-accent-line) !important;
+}
+
+html[data-qd-minimal='on'] .logo-wrap .search-wrap .search-btn:hover em {
+  color: var(--qd-accent) !important;
+}
+
+/* 我的书架按钮 */
+html[data-qd-minimal='on'] .logo-wrap .book-shelf a {
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-sm) !important;
+  color: var(--qd-text-2) !important;
+  transition: all 0.16s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .logo-wrap .book-shelf a:hover {
+  background: var(--qd-accent-soft) !important;
+  border-color: var(--qd-accent) !important;
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .logo-wrap .book-shelf a:hover span {
+  background: transparent !important;
+  color: var(--qd-accent) !important;
+}
+
+/* ========================================================================
+ * 7. 主导航 .main-nav（原来的 #3e3d43 深灰底白字 → 干净的浅色导航条）
+ *    注意：只改配色 / 内边距 / 字重，高度与行高沿用站点的 40px / 38px，
+ *    不做盒模型改造，所以不会挤压右侧的下拉面板定位。
+ * ===================================================================== */
+html[data-qd-minimal='on'] .main-nav-wrap,
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav {
+  background: var(--qd-surface) !important;
+  border-bottom: 1px solid var(--qd-border) !important;
+  box-shadow: none !important;
+}
+
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li a {
+  color: var(--qd-text-2) !important;
+  font: 500 15px/38px var(--qd-font) !important;
+  padding: 0 22px !important;
+  border-bottom: 2px solid transparent !important;
+  transition: color 0.16s var(--qd-ease), background-color 0.16s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li a:hover {
+  background: var(--qd-surface-2) !important;
+  color: var(--qd-text) !important;
+  border-top: 0 !important;
+  border-bottom: 2px solid var(--qd-accent) !important;
+  height: 38px !important;
+  line-height: 38px !important;
+}
+
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li.nav-li a.act,
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li.nav-li a.act:hover {
+  background: var(--qd-accent-soft) !important;
+  border-bottom: 2px solid var(--qd-accent) !important;
+  border-top: 0 !important;
+  color: var(--qd-accent) !important;
+  height: 38px !important;
+  line-height: 38px !important;
+}
+
+/* 「作品分类」入口：深灰块 → 浅色块，汉堡条跟随文字色 */
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li.first,
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li.first:hover span {
+  background: var(--qd-surface-2) !important;
+}
+
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li.first span {
+  background: transparent !important;
+  color: var(--qd-text) !important;
+  font-weight: 600 !important;
+}
+
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li.first span em i {
+  background: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li.first b {
+  border-top-color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li.first b strong {
+  border-top-color: var(--qd-surface-2) !important;
+}
+
+/* 图标型导航项（客户端下载 / 页游）在一堆文字里保持垂直居中 */
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li b.client,
+html[data-qd-minimal='on'] .main-nav-wrap .main-nav li b.webgame {
+  opacity: 0.75 !important;
+  color: inherit !important;
+}
+
+/* ========================================================================
+ * 8. 吸顶导航 .pin-nav-wrap（滚动后出现，站点用 .show 控制显隐）
+ *    浅色毛玻璃 + 发丝线；logo 是白色 PNG，用 invert 反相成深色
+ * ===================================================================== */
+html[data-qd-minimal='on'] .pin-nav-wrap {
+  background: var(--qd-header-bg) !important;
+  border-bottom: 1px solid var(--qd-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .nav-list li a {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .nav-list li a:hover {
+  background: var(--qd-surface-2) !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .nav-list li.act a {
+  background: var(--qd-accent-soft) !important;
+  border-top: 2px solid var(--qd-accent) !important;
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .nav-list li .dropdown,
+html[data-qd-minimal='on'] .pin-nav-wrap .min-user li .dropdown {
+  background: var(--qd-surface) !important;
+  box-shadow: var(--qd-shadow-2) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: 0 0 var(--qd-r-sm) var(--qd-r-sm);
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .nav-list li .dropdown a {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .nav-list li .dropdown a:hover,
+html[data-qd-minimal='on'] .pin-nav-wrap .min-user li .dropdown a:hover {
+  background: var(--qd-surface-2) !important;
+  color: var(--qd-accent) !important;
+}
+
+/* 反相白色 logo，让它在浅色条上可见 */
+html[data-qd-minimal='on'] .pin-nav-wrap .nav-list li.site a.pin-logo {
+  filter: invert(1) hue-rotate(180deg);
+  opacity: 0.85;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .min-user .iconfont,
+html[data-qd-minimal='on'] .pin-nav-wrap .min-user li a {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .min-user li a:hover {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .min-user li .pin-input {
+  background: transparent !important;
+  border-bottom: 1px solid var(--qd-border-2) !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .min-user li .pin-input:focus {
+  border-bottom: 2px solid var(--qd-accent) !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .min-user li.line {
+  border-right-color: var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .pin-nav-wrap .min-user li.book-shelf cite {
+  background: var(--qd-accent) !important;
+  color: #fff !important;
+}
+
+/* ========================================================================
+ * 9. 首页书单三栏 .book-list-wrap / .book-list
+ *    ⚠ 这里是上一版翻车的地方：它是 216px 宽、31px 行高的紧凑文字榜，
+ *      绝对不能被当成「卡片网格」。这条注释是给未来的自己看的。
+ * ===================================================================== */
+html[data-qd-minimal='on'] .book-list-wrap .book-list li {
+  border-top-color: var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li a {
+  color: var(--qd-text-2) !important;
+  transition: color 0.14s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li a.channel {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li a.name {
+  color: var(--qd-text) !important;
+  font-weight: 500 !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li .author,
+html[data-qd-minimal='on'] .book-list-wrap .book-list li .rec {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li a:hover,
+html[data-qd-minimal='on'] .book-list-wrap .book-list li a.name:hover {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li.color-type_1 a {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li.color-type_1 .author {
+  color: var(--qd-text-3) !important;
+}
+
+/* 「更多」箭头：默认淡出，悬浮整块时浮现 */
+html[data-qd-minimal='on'] .book-list-wrap .more,
+html[data-qd-minimal='on'] .finish-book-wrap .more {
+  color: var(--qd-text-3) !important;
+}
+
+/* ========================================================================
+ * 10. 区块标题 h3.wrap-title（左 3px 强调色竖条）
+ *     只在宽度自由的模块上加竖条；.update-wrap / .hot-classify-wrap 有固定
+ *     宽度或右上角角标，加了会挤压，故不加。
+ * ===================================================================== */
+html[data-qd-minimal='on'] h3.wrap-title {
+  color: var(--qd-text) !important;
+  border-bottom-color: var(--qd-border) !important;
+  font-family: var(--qd-font) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px;
+}
+
+html[data-qd-minimal='on'] h3.wrap-title span {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] h3.wrap-title a {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] h3.wrap-title a:hover {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap h3.wrap-title,
+html[data-qd-minimal='on'] .hot-work-box h3.wrap-title,
+html[data-qd-minimal='on'] .left-wrap h3.wrap-title,
+html[data-qd-minimal='on'] .finish-book-wrap h3.wrap-title {
+  position: relative;
+  padding-left: 12px !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap h3.wrap-title::before,
+html[data-qd-minimal='on'] .hot-work-box h3.wrap-title::before,
+html[data-qd-minimal='on'] .left-wrap h3.wrap-title::before,
+html[data-qd-minimal='on'] .finish-book-wrap h3.wrap-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 3px;
+  height: 16px;
+  background: var(--qd-accent);
+  border-radius: var(--qd-r-xs);
+}
+
+/* ========================================================================
+ * 11. 焦点区 / 公告 .focus-wrap / .notice-wrap
+ * ===================================================================== */
+html[data-qd-minimal='on'] .focus-wrap .notice-wrap .notice {
+  background: var(--qd-surface) !important;
+  border: 1px solid var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .focus-wrap .notice-wrap .notice .more {
+  background: var(--qd-surface-3) !important;
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .focus-wrap .notice-wrap .notice .notice-list li a {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .focus-wrap .notice-wrap .notice .notice-list li a:hover {
+  color: var(--qd-accent) !important;
+}
+
+/* 「资讯 / 活动」小红标 → 胶囊 */
+html[data-qd-minimal='on'] .focus-wrap .notice-wrap .notice .notice-list li a em {
+  background: var(--qd-accent-soft) !important;
+  color: var(--qd-accent) !important;
+  border-radius: var(--qd-r-xs) !important;
+}
+
+html[data-qd-minimal='on'] .focus-wrap .focus-img li.middle {
+  background: var(--qd-surface-2) !important;
+}
+
+html[data-qd-minimal='on'] .focus-wrap .focus-img li:hover {
+  box-shadow: var(--qd-shadow-2) !important;
+}
+
+/* 焦点图底部标签条 */
+html[data-qd-minimal='on'] .focus-wrap .focus-slider .lbf-slides .thumb a {
+  background: rgba(0, 0, 0, 0.62) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+html[data-qd-minimal='on'] .focus-wrap .focus-slider .lbf-slides .thumb a.active {
+  background: var(--qd-accent) !important;
+}
+
+/* ========================================================================
+ * 12. 筛选搜索条 .filter-search-wrap（#f2f2f2 → 表面色 + 发丝线）
+ * ===================================================================== */
+html[data-qd-minimal='on'] .filter-search-wrap,
+html[data-qd-minimal='on'] .filter-search-wrap .box-center {
+  background: var(--qd-surface-2) !important;
+  border-top: 1px solid var(--qd-border) !important;
+  border-bottom: 1px solid var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .filter-search-wrap .filter-search-box .title {
+  color: var(--qd-text) !important;
+  font-weight: 600 !important;
+}
+
+html[data-qd-minimal='on'] .filter-search-wrap .filter-search {
+  border-right-color: var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .filter-search-wrap .everyone .title,
+html[data-qd-minimal='on'] .filter-search-wrap .everyone .key-words a {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .filter-search-wrap .everyone .key-words a:hover {
+  color: var(--qd-accent) !important;
+}
+
+/* ========================================================================
+ * 13. 限时免费 .time-limit-wrap（暖米色卡片 → 表面色 + 发丝线）
+ * ===================================================================== */
+html[data-qd-minimal='on'] .time-limit-wrap li.odd,
+html[data-qd-minimal='on'] .time-limit-wrap li.even {
+  background: var(--qd-surface) !important;
+  border: 1px solid var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .time-limit-wrap li:hover {
+  box-shadow: var(--qd-shadow-2) !important;
+  border-color: var(--qd-border-2) !important;
+}
+
+html[data-qd-minimal='on'] .time-limit-wrap li.time-box h3,
+html[data-qd-minimal='on'] .time-limit-wrap li.time-box .countdown {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .time-limit-wrap li .name {
+  color: var(--qd-text) !important;
+  font-weight: 500 !important;
+}
+
+html[data-qd-minimal='on'] .time-limit-wrap li .name:hover {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .time-limit-wrap li s,
+html[data-qd-minimal='on'] .time-limit-wrap li.time-box .type {
+  color: var(--qd-text-3) !important;
+}
+
+/* ========================================================================
+ * 14. 榜单 .rank-wrap（前三名强调色数字块）
+ * ===================================================================== */
+html[data-qd-minimal='on'] .rank-wrap .book-list li .name-box {
+  border-top-color: var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .rank-wrap .book-list li .num-box span {
+  background: var(--qd-surface-3) !important;
+  color: var(--qd-text-3) !important;
+  border-radius: var(--qd-r-xs) !important;
+  font-family: var(--qd-font) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-qd-minimal='on'] .rank-wrap .book-list li .num-box span.num1 {
+  background: var(--qd-accent) !important;
+  color: #fff !important;
+}
+
+html[data-qd-minimal='on'] .rank-wrap .book-list li .num-box span.num2,
+html[data-qd-minimal='on'] .rank-wrap .book-list li .num-box span.num3 {
+  background: var(--qd-accent-soft) !important;
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .rank-wrap .book-list li .name-box a h2,
+html[data-qd-minimal='on'] .rank-wrap .book-list li .name-box a.name {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .rank-wrap .book-list li .name-box a:hover,
+html[data-qd-minimal='on'] .rank-wrap .book-list li .name-box a:hover h2 {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .rank-wrap .book-list li .name-box.rec a {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .rank-wrap .book-list li .name-box i.total,
+html[data-qd-minimal='on'] .rank-wrap .book-list li .name-box span {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .rank-wrap .load-more,
+html[data-qd-minimal='on'] .rank-wrap .load-more span {
+  color: var(--qd-text-3) !important;
+  border-top-color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .rank-wrap .load-more:hover,
+html[data-qd-minimal='on'] .rank-wrap .load-more:hover span {
+  color: var(--qd-accent) !important;
+  border-top-color: var(--qd-accent) !important;
+}
+
+/* ========================================================================
+ * 15. 封面图统一
+ * ===================================================================== */
+html[data-qd-minimal='on'] .book-img img,
+html[data-qd-minimal='on'] .book-wrap .book-img img,
+html[data-qd-minimal='on'] .edit-rec-list .book-img img {
+  border-radius: var(--qd-r-sm) !important;
+  border: 1px solid var(--qd-border) !important;
+  box-shadow: none !important;
+  background: var(--qd-surface-3);
+}
+
+/* ========================================================================
+ * 16. 浮层 / 下拉面板
+ *     （.lbf-* 是站点的公共组件前缀：作品分类面板、联想下拉等）
+ * ===================================================================== */
+html[data-qd-minimal='on'] .lbf-popup,
+html[data-qd-minimal='on'] .all-download-panel,
+html[data-qd-minimal='on'] .main-nav-wrap .game-dropdown {
+  background: var(--qd-surface) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-md) !important;
+  box-shadow: var(--qd-shadow-2) !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .lbf-popup .lbf-combobox-option,
+html[data-qd-minimal='on'] .all-download-panel a {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .lbf-popup .lbf-combobox-option:hover,
+html[data-qd-minimal='on'] .all-download-panel a:hover {
+  background: var(--qd-surface-2) !important;
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .all-download-panel .all-download-con .title {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .all-download-panel .all-download-con .txt,
+html[data-qd-minimal='on'] .all-download-panel .all-download-con .desc,
+html[data-qd-minimal='on'] .all-download-panel .download-website,
+html[data-qd-minimal='on'] .all-download-panel .download-website .download-link {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .all-download-panel .all-download-con .list + .list {
+  box-shadow: -17px 0 0 -16px var(--qd-border) !important;
+}
+
+/* ========================================================================
+ * 17. 右下固定条 .page-bottom-fixed
+ * ===================================================================== */
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-item,
+html[data-qd-minimal='on'] .page-bottom-fixed .bototm-qrcode {
+  background: var(--qd-surface) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-md) !important;
+  box-shadow: var(--qd-shadow-2) !important;
+}
+
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-item .txt,
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-item .icon-txt,
+html[data-qd-minimal='on'] .page-bottom-fixed .go-listen .txt,
+html[data-qd-minimal='on'] .page-bottom-fixed .go-windows .txt {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-login-guide-pop {
+  background: var(--qd-surface) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-md) !important;
+  box-shadow: var(--qd-shadow-2) !important;
+}
+
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-login-guide-pop .title {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-login-guide-pop .page-bottom-login-guide-btn,
+html[data-qd-minimal='on'] .top-nav .login-guide {
+  background: var(--qd-accent) !important;
+  color: #fff !important;
+  border-radius: var(--qd-r-sm) !important;
+}
+
+/* ========================================================================
+ * 18. 页脚 .footer
+ * ===================================================================== */
+html[data-qd-minimal='on'] .footer,
+html[data-qd-minimal='on'] .footer .box-center {
+  background: var(--qd-surface) !important;
+  border-top: 1px solid var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .footer .footer-menu a,
+html[data-qd-minimal='on'] .footer .friend-link a,
+html[data-qd-minimal='on'] .footer .friend-link em,
+html[data-qd-minimal='on'] .footer .footer-menu em {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .footer a:hover {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .footer .footer-text p,
+html[data-qd-minimal='on'] .footer .copy-right p,
+html[data-qd-minimal='on'] .footer .copy-right p a,
+html[data-qd-minimal='on'] .footer .safety-box p,
+html[data-qd-minimal='on'] .footer .safety-box p a {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .footer .safety-img a {
+  border-color: var(--qd-border) !important;
+  border-radius: var(--qd-r-sm) !important;
+}
+
+/* ========================================================================
+ * 19. 站点写死浅色底的兜底覆盖
+ *     数据来源：把实抓的 index.*.css 全量扫一遍，取出所有含
+ *     #fff / #fafafa / #f7f7f7 / #f2f2f2 / #fcfcfa / #f7f6f2 等写死浅色底的规则，
+ *     去重后共 46 条，逐条比对后在这里补齐。夜间模式下这些白块是最扎眼的问题。
+ * ===================================================================== */
+
+/* 顶部「我的书架」按钮容器（站点写死 #fff，夜间会变成刺眼白块） */
+html[data-qd-minimal='on'] .logo-wrap .book-shelf {
+  background: transparent !important;
+}
+
+/* 作品分类下拉面板的条目（#f7f6f2 / #fcfcfa 米色） */
+html[data-qd-minimal='on'] .classify-list dd {
+  background: var(--qd-surface-2) !important;
+}
+
+html[data-qd-minimal='on'] .classify-list dd.even {
+  background: var(--qd-surface) !important;
+}
+
+html[data-qd-minimal='on'] .classify-list dd:hover {
+  background: var(--qd-accent-soft) !important;
+}
+
+html[data-qd-minimal='on'] .classify-list dd a,
+html[data-qd-minimal='on'] .classify-list dd .info {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .classify-list dd:hover a,
+html[data-qd-minimal='on'] .classify-list dd:hover .info {
+  color: var(--qd-accent) !important;
+}
+
+/* lbf 公共组件：联想下拉 / 组合筛选 / 面板 */
+html[data-qd-minimal='on'] .lbf-autocomplete-suggestions,
+html[data-qd-minimal='on'] .lbf-combobox-panel,
+html[data-qd-minimal='on'] .lbf-combobox-on,
+html[data-qd-minimal='on'] .lbf-combobox .lbf-combobox-label,
+html[data-qd-minimal='on'] .lbf-combobox .lbf-combobox-label:hover {
+  background: var(--qd-surface) !important;
+  border-color: var(--qd-border) !important;
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .lbf-autocomplete-suggestions li,
+html[data-qd-minimal='on'] .lbf-combobox-panel .lbf-combobox-item {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .lbf-combobox-panel .lbf-combobox-item:hover,
+html[data-qd-minimal='on'] .lbf-autocomplete-suggestions li:hover {
+  background: var(--qd-surface-2) !important;
+  color: var(--qd-accent) !important;
+}
+
+/* 站点的弹层组件 */
+html[data-qd-minimal='on'] .popup-wrap,
+html[data-qd-minimal='on'] .popup-wrap .popup-box,
+html[data-qd-minimal='on'] .popup-title,
+html[data-qd-minimal='on'] .tip-popup,
+html[data-qd-minimal='on'] .top-nav #login-guide-pop,
+html[data-qd-minimal='on'] .nav-wrap #login-box #login-guide-pop {
+  background: var(--qd-surface) !important;
+  border: 1px solid var(--qd-border) !important;
+  color: var(--qd-text) !important;
+}
+
+/* 灰色按钮 / 编辑推荐图片位 / 搜索结果页顶栏 */
+html[data-qd-minimal='on'] .grey-btn {
+  background: var(--qd-surface-2) !important;
+  border: 1px solid var(--qd-border) !important;
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .grey-btn:hover {
+  background: var(--qd-surface-3) !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .edit-rec-img-list li {
+  background: var(--qd-surface-2) !important;
+}
+
+html[data-qd-minimal='on'] .all-search {
+  background: var(--qd-surface-2) !important;
+  border-bottom: 1px solid var(--qd-border) !important;
+}
+
+/* ========================================================================
+ * 20. 非首页页面降级层（书架 my. / 免费 free. / 全部作品 all. 等）
+ *     这些模板结构未知，所以只用「绝对不会破坏布局」的三类规则：
+ *     表格发丝线、列表悬浮底色、控件圆角。具体模块的精确优化见 README
+ *     的「如何扩展选择器」一节（可用弹窗里的「导出页面结构」拿到真实 class）。
+ * ===================================================================== */
+html[data-qd-minimal='on'] table {
+  border-color: var(--qd-border) !important;
+  border-collapse: collapse;
+}
+
+html[data-qd-minimal='on'] th,
+html[data-qd-minimal='on'] td {
+  border-color: var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] tr:hover > td,
+html[data-qd-minimal='on'] tr:hover > th {
+  background: var(--qd-surface-2) !important;
+}
+
+html[data-qd-minimal='on'] ul > li:hover,
+html[data-qd-minimal='on'] ol > li:hover {
+  background-color: transparent;
+}
+
+html[data-qd-minimal='on'] fieldset,
+html[data-qd-minimal='on'] legend {
+  border-color: var(--qd-border) !important;
+}
+
+/* ========================================================================
+ * 21. 隐藏清单
+ * ===================================================================== */
+
+/* 21.1 由 content.js 判定的节点（含页游入口、可恢复） */
+html[data-qd-minimal='on'] [data-qd-hidden='1'] {
+  display: none !important;
+}
+
+/* 21.2 页游入口（真实标记：顶部随机广告条 + 导航里的页游项） */
+html[data-qd-minimal='on'][data-qd-nogames='on'] #j-topOpBox,
+html[data-qd-minimal='on'][data-qd-nogames='on'] #topGameOp,
+html[data-qd-minimal='on'][data-qd-nogames='on'] .top-op-box,
+html[data-qd-minimal='on'][data-qd-nogames='on'] .top-game-op,
+html[data-qd-minimal='on'][data-qd-nogames='on'] li#game-web,
+html[data-qd-minimal='on'][data-qd-nogames='on'] li.game.web,
+html[data-qd-minimal='on'][data-qd-nogames='on'] #web-dropdown,
+html[data-qd-minimal='on'][data-qd-nogames='on'] .game-dropdown,
+html[data-qd-minimal='on'][data-qd-nogames='on'] .web-game-list {
+  display: none !important;
+}
+
+/* 21.3 推广位（默认关闭，可在弹窗里打开）
+ *      用属性边界选择器，避免命中 load-more 这类含 "ad-" 的类名 */
+html[data-qd-minimal='on'][data-qd-noads='on'] ins.adsbygoogle,
+html[data-qd-minimal='on'][data-qd-noads='on'] [class^='ad-'],
+html[data-qd-minimal='on'][data-qd-noads='on'] [class*=' ad-'],
+html[data-qd-minimal='on'][data-qd-noads='on'] [class*='-ad-'],
+html[data-qd-minimal='on'][data-qd-noads='on'] [class$='-ad'],
+html[data-qd-minimal='on'][data-qd-noads='on'] [id^='ad_'],
+html[data-qd-minimal='on'][data-qd-noads='on'] [id^='ad-'],
+html[data-qd-minimal='on'][data-qd-noads='on'] [class*='adsbygoogle'],
+html[data-qd-minimal='on'][data-qd-noads='on'] [class*='advert'],
+html[data-qd-minimal='on'][data-qd-noads='on'] #banner-two,
+html[data-qd-minimal='on'][data-qd-noads='on'] #banner3,
+html[data-qd-minimal='on'][data-qd-noads='on'] #banner4,
+html[data-qd-minimal='on'][data-qd-noads='on'] .banner-wrap-items,
+html[data-qd-minimal='on'][data-qd-noads='on'] .top-op-box,
+html[data-qd-minimal='on'][data-qd-noads='on'] iframe[src*='googleads'],
+html[data-qd-minimal='on'][data-qd-noads='on'] iframe[src*='/ad/'] {
+  display: none !important;
+}
+
+/* ========================================================================
+ * 23. 圆弧外框统一层：可按按键 / 每本书
+ * ---------------------------------------------------------------------------
+ * 规格（用户指定）：
+ *   圆角        12px（--qd-r-box），"接近圆弧"但不做胶囊
+ *   框内        表面色 —— 夜间 #171C20
+ *   框线        1px 纤细线 —— 夜间 #303539
+ *   文字        —— 夜间 #BEC8D2
+ *   强调色只出现在悬浮 / 按下，避免满屏彩色块
+ * 尺寸约束（来自实抓 CSS，不是估的）：
+ *   .index-two-wrap .book-list ul 写死 height:568px + overflow:hidden，
+ *   每列固定 18 行 → 单行高度必须 ≤ 31.5px，这里取 29px + 2px 间距 = 558px。
+ *   同时把行内浮动改成 flex，否则加 1px 边框 + 内边距后 float 会换行被裁掉。
+ * ===================================================================== */
+
+/* ---------- 23.1 所有可按按键 ---------- */
+html[data-qd-minimal='on'] button,
+html[data-qd-minimal='on'] input[type='button'],
+html[data-qd-minimal='on'] input[type='submit'],
+html[data-qd-minimal='on'] input[type='reset'],
+html[data-qd-minimal='on'] .btn,
+html[data-qd-minimal='on'] .red-btn,
+html[data-qd-minimal='on'] .blue-btn,
+html[data-qd-minimal='on'] .grey-btn,
+html[data-qd-minimal='on'] .free-blue-btn,
+html[data-qd-minimal='on'] .logo-wrap .book-shelf a,
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-item,
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-login-guide-pop .page-bottom-login-guide-btn,
+html[data-qd-minimal='on'] .all-download-panel .all-download-con .download-desk {
+  background-color: var(--qd-surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  color: var(--qd-text) !important;
+  box-shadow: none !important;
+  transition: background-color 0.16s var(--qd-ease), border-color 0.16s var(--qd-ease),
+    color 0.16s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] button:hover,
+html[data-qd-minimal='on'] input[type='button']:hover,
+html[data-qd-minimal='on'] input[type='submit']:hover,
+html[data-qd-minimal='on'] input[type='reset']:hover,
+html[data-qd-minimal='on'] .btn:hover,
+html[data-qd-minimal='on'] .red-btn:hover,
+html[data-qd-minimal='on'] .blue-btn:hover,
+html[data-qd-minimal='on'] .grey-btn:hover,
+html[data-qd-minimal='on'] .free-blue-btn:hover,
+html[data-qd-minimal='on'] .logo-wrap .book-shelf a:hover,
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-item:hover,
+html[data-qd-minimal='on'] .all-download-panel .all-download-con .download-desk:hover {
+  background-color: var(--qd-surface-2) !important;
+  border-color: var(--qd-accent-line) !important;
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] button:active,
+html[data-qd-minimal='on'] .red-btn:active,
+html[data-qd-minimal='on'] .btn:active,
+html[data-qd-minimal='on'] .logo-wrap .book-shelf a:active {
+  background-color: var(--qd-accent) !important;
+  border-color: var(--qd-accent) !important;
+  color: #fff !important;
+}
+
+/* 不可用状态的按钮保持灰淡，不要跟着反色 */
+html[data-qd-minimal='on'] .free-blue-btn.disabled,
+html[data-qd-minimal='on'] button[disabled] {
+  color: var(--qd-text-3) !important;
+  opacity: 0.55;
+}
+
+/* ---------- 23.2 首页三栏书单：每本书一个圆弧框 ---------- */
+html[data-qd-minimal='on'] .index-two-wrap .book-list li,
+html[data-qd-minimal='on'] .book-list-wrap .book-list li {
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 29px !important;
+  margin: 0 0 2px !important;
+  padding: 0 6px !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  background: var(--qd-surface) !important;
+  overflow: hidden !important;
+  transition: background-color 0.14s var(--qd-ease), border-color 0.14s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .index-two-wrap .book-list li:first-child,
+html[data-qd-minimal='on'] .book-list-wrap .book-list li:first-child {
+  border-top: 1px solid var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .index-two-wrap .book-list li:hover,
+html[data-qd-minimal='on'] .book-list-wrap .book-list li:hover {
+  background: var(--qd-surface-2) !important;
+  border-color: var(--qd-accent-line) !important;
+}
+
+/* 行内浮动 → flex：书名自适应省略号，作者固定在右侧，绝不换行 */
+html[data-qd-minimal='on'] .book-list-wrap .book-list li a.channel {
+  float: none !important;
+  flex: 0 0 auto !important;
+  margin-left: 0 !important;
+  height: 27px !important;
+  line-height: 27px !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li strong {
+  float: none !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+  padding-right: 20px !important;
+  overflow: hidden !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li a.name {
+  display: block !important;
+  margin-left: 0 !important;
+  max-width: 100% !important;
+  height: 27px !important;
+  line-height: 27px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li strong .hot {
+  top: 50% !important;
+  right: 0 !important;
+  transform: translateY(-50%);
+}
+
+html[data-qd-minimal='on'] .book-list-wrap .book-list li .author,
+html[data-qd-minimal='on'] .book-list-wrap .book-list li .rec {
+  float: none !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: 64px !important;
+  height: 27px !important;
+  line-height: 27px !important;
+  white-space: nowrap !important;
+}
+
+/* ---------- 23.3 榜单：每本书一个圆弧框 ---------- */
+/* ⚠ 榜首是一条 li.unfold，里面装的是整张 .book-wrap 卡（站点高度 114px）。
+ *   绝不能套用单行的 29px 框 —— 上一版就是这么写的，结果 overflow:hidden
+ *   把整张卡裁成只剩「NO.1」，书名/封面/数字全没了（v1.6.0 修复）。 */
+html[data-qd-minimal='on'] .rank-list .book-list li.unfold,
+html[data-qd-minimal='on'] .rank-wrap .book-list li.unfold {
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 0 4px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+/* 单行：29 + 1 = 30px。榜首 114 + 4 后，整列 418px 仍落在站点写死的 423px 内，不会被裁。
+ * ⚠ 必须用 flex 而不是沿用站点的 float：单行内容 = num-box 28 + name-box 188
+ *   （a.name 116 + i.total 72）= 216px，一旦列宽不足就会**浮动换行**，
+ *   而 li 有 overflow:hidden，换行后的书名会被整条裁掉 —— 线上正是这个症状。
+ *   flex 下书名自动收窄打省略号，任何列宽都不会换行。 */
+html[data-qd-minimal='on'] .rank-list .book-list li:not(.unfold),
+html[data-qd-minimal='on'] .rank-wrap .book-list li:not(.unfold) {
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 29px !important;
+  margin: 0 0 1px !important;
+  padding: 0 8px 0 0 !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  background: var(--qd-surface) !important;
+  overflow: hidden !important;
+  transition: background-color 0.14s var(--qd-ease), border-color 0.14s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .rank-list .book-list li:not(.unfold):hover,
+html[data-qd-minimal='on'] .rank-wrap .book-list li:not(.unfold):hover {
+  background: var(--qd-surface-2) !important;
+  border-color: var(--qd-accent-line) !important;
+}
+
+/* 行内不再需要旧的内部分隔线 */
+html[data-qd-minimal='on'] .rank-list .book-list li .name-box {
+  border-top-color: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+  float: none !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 27px !important;
+}
+
+html[data-qd-minimal='on'] .rank-list .book-list li .num-box {
+  float: none !important;
+  flex: 0 0 auto !important;
+  height: 27px !important;
+  width: 28px !important;
+}
+
+html[data-qd-minimal='on'] .rank-list .book-list li .num-box span {
+  margin-top: 5px !important;
+}
+
+html[data-qd-minimal='on'] .rank-list .book-list li .name-box a,
+html[data-qd-minimal='on'] .rank-list .book-list li .name-box a.name {
+  box-sizing: border-box !important;
+  float: none !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  height: 27px !important;
+  line-height: 27px !important;
+  overflow: hidden !important;
+}
+
+html[data-qd-minimal='on'] .rank-list .book-list li .name-box a h2 {
+  height: 27px !important;
+  line-height: 27px !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+html[data-qd-minimal='on'] .rank-list .book-list li .name-box i.total,
+html[data-qd-minimal='on'] .rank-list .book-list li .name-box span {
+  float: none !important;
+  flex: 0 0 auto !important;
+  max-width: 64px !important;
+  text-align: right !important;
+  width: auto !important;
+  line-height: 27px !important;
+}
+
+/* ---------- 23.3b 榜单多栏：栏间留白 + 圆角容器 ----------
+ * 用 grid + auto-fill/minmax 而不是固定栅格：
+ *   首页是 5 栏，排行榜页（/rank/）是 8 栏 —— 8 栏挤在一行每栏只有 ~150px，非常挤。
+ *   auto-fill 让栏数随宽度自动决定、装不下就换行，两个页面共用一套规则。
+ * 站点给 .rank-list-row 写死了 height:423px + overflow:hidden，
+ * 换行后必须放开，否则第二行直接被裁掉。 */
+html[data-qd-minimal='on'] .rank-list-row {
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)) !important;
+  align-items: start !important;
+  gap: 16px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  padding: 0 0 2px !important;
+}
+
+html[data-qd-minimal='on'] .rank-list-row > .rank-list {
+  box-sizing: border-box !important;
+  flex: none !important;
+  float: none !important;
+  min-width: 0 !important;
+  width: auto !important;
+  background: var(--qd-surface) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  padding: 12px 12px 10px !important;
+}
+
+html[data-qd-minimal='on'] .rank-list-row > .rank-list .wrap-title {
+  border-bottom: 0 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+  padding-bottom: 0 !important;
+}
+
+/* 容器已经是表面色了，里面的单行改用弱底，避免「框套框」 */
+html[data-qd-minimal='on'] .rank-list-row > .rank-list .book-list li:not(.unfold) {
+  background: var(--qd-surface-2) !important;
+  border-color: transparent !important;
+}
+
+html[data-qd-minimal='on'] .rank-list-row > .rank-list .book-list li:not(.unfold):hover {
+  border-color: var(--qd-accent-line) !important;
+}
+
+html[data-qd-minimal='on'] .rank-list-row > .rank-list .book-wrap {
+  padding: 0 0 4px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* ---------- 23.4 带封面的书卡（热门作品 / 评分榜 / 新书榜） ---------- */
+html[data-qd-minimal='on'] .book-wrap {
+  box-sizing: border-box !important;
+  padding: 14px 10px !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  background: var(--qd-surface) !important;
+  transition: background-color 0.16s var(--qd-ease), border-color 0.16s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .book-wrap:hover {
+  background: var(--qd-surface-2) !important;
+  border-color: var(--qd-accent-line) !important;
+}
+
+/* 外框已由 .book-wrap 提供，去掉 li 上的旧分隔线 */
+html[data-qd-minimal='on'] .score-list li,
+html[data-qd-minimal='on'] .score-list li.unfold {
+  border-top-color: transparent !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
+
+html[data-qd-minimal='on'] .book-wrap .book-info h2,
+html[data-qd-minimal='on'] .book-wrap .book-info h2 .book-name {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .book-wrap .book-info p.author a,
+html[data-qd-minimal='on'] .book-wrap .book-info .desc {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .book-wrap .book-info p.digital {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .book-wrap .book-info .tag {
+  border: 1px solid var(--qd-accent-line) !important;
+  border-radius: var(--qd-r-xs) !important;
+  color: var(--qd-accent) !important;
+}
+
+/* ---------- 23.5 封面圆角 ---------- */
+html[data-qd-minimal='on'] .book-img img,
+html[data-qd-minimal='on'] .book-wrap .book-cover img,
+html[data-qd-minimal='on'] .edit-rec-list .book-img img {
+  border-radius: var(--qd-r-md) !important;
+  border: 1px solid var(--qd-border) !important;
+  box-shadow: none !important;
+  background: var(--qd-surface-3);
+}
+
+/* ---------- 23.6 限时免费 / 编辑推荐的每本书 ---------- */
+html[data-qd-minimal='on'] .time-limit-wrap li.time-box,
+html[data-qd-minimal='on'] .edit-rec-wrap .edit-rec-list li {
+  box-sizing: border-box !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  background: var(--qd-surface) !important;
+  transition: background-color 0.16s var(--qd-ease), border-color 0.16s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .edit-rec-wrap .edit-rec-list li {
+  padding: 12px 14px !important;
+}
+
+html[data-qd-minimal='on'] .time-limit-wrap li.time-box:hover,
+html[data-qd-minimal='on'] .edit-rec-wrap .edit-rec-list li:hover {
+  background: var(--qd-surface-2) !important;
+  border-color: var(--qd-accent-line) !important;
+}
+
+html[data-qd-minimal='on'] .edit-rec-wrap .edit-rec-list li h3 a {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'] .edit-rec-wrap .edit-rec-list li p {
+  color: var(--qd-text-3) !important;
+}
+
+/* ---------- 23.7 浮层也统一到同一圆角刻度 ---------- */
+html[data-qd-minimal='on'] .lbf-popup,
+html[data-qd-minimal='on'] .all-download-panel,
+html[data-qd-minimal='on'] .main-nav-wrap .game-dropdown,
+html[data-qd-minimal='on'] .page-bottom-fixed .bototm-qrcode {
+  border-radius: var(--qd-r-box) !important;
+}
+
+/* ========================================================================
+ * 24. 全部作品页（www.qidian.com/all/）：左侧筛选项 + 右侧每本书
+ * ---------------------------------------------------------------------------
+ * 选择器与尺寸全部来自实抓的 all/index.*.css（157KB）与 104KB DOM：
+ *   左栏  .range-sidebar { width:216px }
+ *         选项  .select-list .work-filter ul li { float:left; height:20px; padding:0 4px }
+ *         选中  .select-list .work-filter ul li.act { background:#333 }
+ *   右栏  每本书 .book-img-text .all-img-list li { float:left; width:477px; height:162px;
+ *                                                  padding-top:25px; border-top:1px … }
+ *         封面  .book-img-box { width:102px; height:136px; margin-right:16px }
+ *         信息  .all-img-list li .book-mid-info { width:344px }
+ *         窄屏  @media (max-width:1280px) li{width:372px} info{width:240px}
+ *   ⇒ 单行内容 = 102 + 16 + 344 = 462px。加外框后必须保证：
+ *      · box-sizing:border-box，宽度 477 / 372 不变 → 两列浮动不会被挤下去
+ *      · 左右内边距合计 ≤ 477-2-462 = 13px（窄屏 ≤ 372-2-358 = 12px），故取 4px×2=8px
+ *      · 高度 162px 同理用 border-box 吃掉 padding，行距改用 margin 提供
+ * ===================================================================== */
+
+/* ---------- 24.1 左侧：分类 / 状态 / 属性 / 字数 / 品质 / 更新时间 / 标签 ---------- */
+html[data-qd-minimal='on'] .select-list .work-filter ul li {
+  box-sizing: border-box !important;
+  height: 24px !important;
+  margin: 0 7px 7px 0 !important;
+  padding: 0 8px !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  background: var(--qd-surface) !important;
+  text-align: center !important;
+  transition: background-color 0.14s var(--qd-ease), border-color 0.14s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .select-list .work-filter ul li a {
+  display: block !important;
+  font-family: var(--qd-font) !important;
+  font-size: 12px !important;
+  line-height: 22px !important;
+  color: var(--qd-text-2) !important;
+  white-space: nowrap !important;
+}
+
+html[data-qd-minimal='on'] .select-list .work-filter ul li:hover {
+  background: var(--qd-surface-2) !important;
+  border-color: var(--qd-accent-line) !important;
+}
+
+html[data-qd-minimal='on'] .select-list .work-filter ul li:hover a {
+  color: var(--qd-accent) !important;
+}
+
+/* 选中项：原来的 #333 黑块 → 强调色胶囊 */
+html[data-qd-minimal='on'] .select-list .work-filter ul li.act {
+  background: var(--qd-accent-soft) !important;
+  border-color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .select-list .work-filter ul li.act a {
+  color: var(--qd-accent) !important;
+  font-weight: 600 !important;
+}
+
+/* 选中项下面那个双三角小箭头：已经有强调色胶囊了，去掉更干净 */
+html[data-qd-minimal='on'] .select-list .work-filter ul li.arrow cite {
+  display: none !important;
+}
+
+/* 「更多」展开项 */
+html[data-qd-minimal='on'] .select-list .work-filter ul li.more a,
+html[data-qd-minimal='on'] .select-list .work-filter ul li.more a span {
+  color: var(--qd-text-3) !important;
+  border-top-color: var(--qd-text-3) !important;
+}
+
+/* 分组小标题与分隔线 */
+html[data-qd-minimal='on'] .select-list .work-filter h3 {
+  color: var(--qd-text) !important;
+  font-weight: 600 !important;
+}
+
+html[data-qd-minimal='on'] .select-list .work-filter,
+html[data-qd-minimal='on'] .range-sidebar .site,
+html[data-qd-minimal='on'] .range-sidebar .selected {
+  border-bottom-color: var(--qd-border) !important;
+}
+
+/* 子分类浮层（站点写死米色 #f7f6f2 + 3px 圆角） */
+html[data-qd-minimal='on'] .select-list .sub-type {
+  background: var(--qd-surface-2) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+}
+
+html[data-qd-minimal='on'] .select-list .sub-type dd a {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .select-list .sub-type dd a:hover {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .select-list .sub-type dd.act a {
+  background: var(--qd-accent-soft) !important;
+  border-radius: var(--qd-r-xs) !important;
+  color: var(--qd-accent) !important;
+}
+
+/* 「已选条件」标签（站点是实心红块） */
+html[data-qd-minimal='on'] .range-sidebar .selected a {
+  box-sizing: border-box !important;
+  height: 22px !important;
+  margin: 0 8px 8px 0 !important;
+  padding: 0 8px !important;
+  background: var(--qd-accent-soft) !important;
+  border: 1px solid var(--qd-accent-line) !important;
+  border-radius: var(--qd-r-pill) !important;
+  color: var(--qd-accent) !important;
+  font: 500 12px/20px var(--qd-font) !important;
+}
+
+html[data-qd-minimal='on'] .range-sidebar .selected a cite {
+  color: var(--qd-accent) !important;
+}
+
+/* 男生 / 女生 / 出版 / 听书 标签头（保留页签形状，只改配色） */
+html[data-qd-minimal='on'] .range-sidebar .site a {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .range-sidebar .site a.act {
+  background: var(--qd-surface) !important;
+  border-left-color: var(--qd-border) !important;
+  border-right-color: var(--qd-border) !important;
+  border-top-color: var(--qd-accent) !important;
+  color: var(--qd-accent) !important;
+}
+
+/* ---------- 24.2 右侧：每本书一个圆弧外框（两列浮动，宽度不变） ---------- */
+html[data-qd-minimal='on'] .book-img-text .all-img-list li {
+  box-sizing: border-box !important;
+  padding: 12px 4px 10px !important;
+  margin: 0 0 10px !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  background: var(--qd-surface) !important;
+  transition: background-color 0.16s var(--qd-ease), border-color 0.16s var(--qd-ease);
+}
+
+/* 首行两条的「无边框 / 无上内边距」特例要去掉，否则第一排没有框 */
+html[data-qd-minimal='on'] .book-img-text li:first-child,
+html[data-qd-minimal='on'] .book-img-text .all-img-list li:first-child + li {
+  border-top: 1px solid var(--qd-border) !important;
+  padding-top: 12px !important;
+}
+
+html[data-qd-minimal='on'] .book-img-text .all-img-list li:hover {
+  background: var(--qd-surface-2) !important;
+  border-color: var(--qd-accent-line) !important;
+}
+
+/* 封面：原为 0 1px 6px 的投影方图，改成圆角 + 框线 */
+html[data-qd-minimal='on'] .book-img-text .book-img-box a {
+  box-sizing: border-box !important;
+  border-radius: var(--qd-r-md) !important;
+  border: 1px solid var(--qd-border) !important;
+  box-shadow: none !important;
+}
+
+html[data-qd-minimal='on'] .book-img-text .book-img-box a img {
+  border-radius: var(--qd-r-md) !important;
+}
+
+/* 书名 / 作者 / 简介 / 更新信息 */
+html[data-qd-minimal='on'] .book-img-text .book-mid-info h2,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info h2 a {
+  color: var(--qd-text) !important;
+  font-weight: 600 !important;
+}
+
+html[data-qd-minimal='on'] .book-img-text .book-mid-info h2 a:hover {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.author a,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.author span,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.author i,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.author em {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.author a:hover {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.intro {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.update,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.update b,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.update em,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.update i,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.update span {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.update a {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.update a:hover {
+  color: var(--qd-accent) !important;
+}
+
+/* 关键词高亮（站点用 #bf2c24） */
+html[data-qd-minimal='on'] .book-img-text .book-mid-info cite.red-kw,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.update a.red,
+html[data-qd-minimal='on'] .book-img-text .book-mid-info p.update b.red {
+  color: var(--qd-accent) !important;
+}
+
+/* ---------- 24.3 中间工具条：底色 + 排序按键盘 ---------- */
+html[data-qd-minimal='on'] .tool-bar {
+  background: var(--qd-surface-2) !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+}
+
+html[data-qd-minimal='on'] .tool-bar .count-info,
+html[data-qd-minimal='on'] .tool-bar .count-info span {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .tool-bar .select-wrap > a {
+  box-sizing: border-box !important;
+  height: 26px !important;
+  margin-top: 7px !important;
+  margin-left: 8px !important;
+  margin-right: 8px !important;
+  padding: 0 12px !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  background: var(--qd-surface) !important;
+  color: var(--qd-text-2) !important;
+  font: 500 12px/24px var(--qd-font) !important;
+  vertical-align: top !important;
+  transition: background-color 0.14s var(--qd-ease), border-color 0.14s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .tool-bar .select-wrap > a:first-child {
+  margin-left: 0 !important;
+}
+
+html[data-qd-minimal='on'] .tool-bar .select-wrap > a cite,
+html[data-qd-minimal='on'] .tool-bar .select-wrap > a cite.iconfont {
+  color: inherit !important;
+  line-height: 24px !important;
+}
+
+html[data-qd-minimal='on'] .tool-bar .select-wrap > a:hover {
+  background: var(--qd-surface-2) !important;
+  border-color: var(--qd-accent-line) !important;
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .tool-bar .select-wrap > a.act {
+  background: var(--qd-accent-soft) !important;
+  border-color: var(--qd-accent) !important;
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .tool-bar .select-wrap em {
+  color: var(--qd-border-2) !important;
+}
+
+html[data-qd-minimal='on'] .tool-bar .select-wrap .lbf-combobox .lbf-combobox-label {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] .tool-bar .select-wrap .lbf-combobox .lbf-combobox-label:hover,
+html[data-qd-minimal='on'] .tool-bar .select-wrap .lbf-combobox .act .iconfont {
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .tool-bar .select-wrap .lbf-combobox .lbf-dropdown-on {
+  background: var(--qd-surface) !important;
+}
+
+/* 视图切换（图文 / 纯文字）图标 */
+html[data-qd-minimal='on'] .view-mode .iconfont {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .view-mode .iconfont.act,
+html[data-qd-minimal='on'] .view-mode .iconfont:hover {
+  color: var(--qd-accent) !important;
+}
+
+/* ---------- 24.4 页脚 / 底部分页 / 本周热推 ---------- */
+
+/* 分页：站点只给了 1px 白描边、没有字色，夜间会跟底色糊在一起 */
+html[data-qd-minimal='on'] .page-box .pagination li a {
+  box-sizing: border-box !important;
+  min-width: 28px;
+  height: 26px !important;
+  padding: 0 8px !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-box) !important;
+  background: var(--qd-surface) !important;
+  color: var(--qd-text-2) !important;
+  font: 500 13px/24px var(--qd-font) !important;
+  text-align: center !important;
+  transition: background-color 0.14s var(--qd-ease), border-color 0.14s var(--qd-ease),
+    color 0.14s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .page-box .pagination li a:hover {
+  border-color: var(--qd-accent-line) !important;
+  color: var(--qd-accent) !important;
+}
+
+html[data-qd-minimal='on'] .page-box .pagination .lbf-pagination-current,
+html[data-qd-minimal='on'] .page-box .pagination .lbf-pagination-current:hover {
+  background: var(--qd-accent) !important;
+  border-color: var(--qd-accent) !important;
+  color: #fff !important;
+}
+
+html[data-qd-minimal='on'] .page-box .pagination .lbf-pagination-disabled,
+html[data-qd-minimal='on'] .page-box .pagination .lbf-pagination-disabled:hover {
+  background: var(--qd-surface) !important;
+  border-color: var(--qd-border) !important;
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .page-box .pagination .lbf-pagination-jump input,
+html[data-qd-minimal='on'] .page-box .pagination .lbf-pagination-jump .lbf-pagination-go {
+  box-sizing: border-box !important;
+  height: 26px !important;
+  border: 1px solid var(--qd-border) !important;
+  border-radius: var(--qd-r-sm) !important;
+  background: var(--qd-surface) !important;
+  color: var(--qd-text-2) !important;
+  font: 500 13px/24px var(--qd-font) !important;
+}
+
+html[data-qd-minimal='on'] .page-box .pagination .lbf-pagination-jump .lbf-pagination-go {
+  width: 40px !important;
+}
+
+html[data-qd-minimal='on'] .page-box .pagination .lbf-pagination-jump .lbf-pagination-go:hover {
+  border-color: var(--qd-accent-line) !important;
+  color: var(--qd-accent) !important;
+}
+
+/* 本周热推：站点把书名写死成 #000，夜间直接看不见 */
+html[data-qd-minimal='on'] .weekly-hot-rec .title {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .weekly-hot-rec .book-name-container .book-item {
+  color: var(--qd-text-2) !important;
+  transition: color 0.14s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .weekly-hot-rec .book-name-container .book-item:hover {
+  color: var(--qd-accent) !important;
+}
+
+/* ---------- 24.5 右下固定条：文字与图标提亮 ---------- */
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-item .txt,
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-item .icon-txt,
+html[data-qd-minimal='on'] .page-bottom-fixed .go-listen .txt,
+html[data-qd-minimal='on'] .page-bottom-fixed .go-windows .txt {
+  color: var(--qd-text-2) !important;
+}
+
+/* iconfont 是文字字形，直接改字色 */
+html[data-qd-minimal='on'] .page-bottom-fixed .page-bottom-item .iconfont {
+  color: var(--qd-text) !important;
+  opacity: 1 !important;
+}
+
+/* 扫码 / 红包 / 听书 / 回顶 这几个是 PNG 雪碧图，字色管不着，
+   夜间用反相把它们变浅，否则深灰图标贴在深底上等于隐形 */
+html[data-qd-minimal='on'][data-qd-theme='dark'] .page-bottom-fixed .page-bottom-item .icon,
+html[data-qd-minimal='on'][data-qd-theme='dark'] .page-bottom-fixed .page-bottom-item .icon-code,
+html[data-qd-minimal='on'][data-qd-theme='dark'] .page-bottom-fixed .page-bottom-item .icon-scan,
+html[data-qd-minimal='on'][data-qd-theme='dark'] .page-bottom-fixed .page-bottom-item .icon-redbag,
+html[data-qd-minimal='on'][data-qd-theme='dark'] .page-bottom-fixed .page-bottom-item .icon-gotop,
+html[data-qd-minimal='on'][data-qd-theme='dark'] .page-bottom-fixed .page-bottom-item .icon-listen {
+  filter: invert(1) opacity(0.85);
+}
+
+/* ========================================================================
+ * 25. 书籍详情页（www.qidian.com/book/{id}/）
+ * ---------------------------------------------------------------------------
+ * 这一页是**另一套模板**：顶部是 .nav-wrap（不是 .top-nav），首屏是
+ * .book-detail 玻璃拟态卡（#gradient / #bg-left / #bg-right 为负层级装饰层），
+ * 内容区 .book-detail-mid 自带 #f7f7fc 浅底。
+ * 因此这一页**固定为日间**（见 content.js 的 lockedDay），夜间不参与，
+ * 色号仍走日间令牌，保证与站点自己的浅色设计一致。
+ * ===================================================================== */
+html[data-qd-minimal='on'] .nav-wrap {
+  background: var(--qd-surface) !important;
+  border-bottom: 1px solid var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'] .nav-wrap .left-items div,
+html[data-qd-minimal='on'] .nav-wrap .right-items a,
+html[data-qd-minimal='on'] .nav-wrap .my-bookshelf {
+  color: var(--qd-text-2) !important;
+  transition: color 0.14s var(--qd-ease);
+}
+
+html[data-qd-minimal='on'] .nav-wrap .left-items div:hover,
+html[data-qd-minimal='on'] .nav-wrap .right-items a:hover,
+html[data-qd-minimal='on'] .nav-wrap .my-bookshelf:hover {
+  color: var(--qd-accent) !important;
+}
+
+/* 首屏玻璃卡与正文区的发丝线统一（只动线，不动站点自己的浅色底与模糊层） */
+html[data-qd-minimal='on'] .crumbs-nav-new,
+html[data-qd-minimal='on'] .crumbs-nav-new a {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] .book-info-outer .left-items-detail,
+html[data-qd-minimal='on'] .book-info-outer .right-items-detail {
+  color: var(--qd-text-2) !important;
+}
+
+/* ========================================================================
+ * 26. 未知模板的夜间自适应落点 + 书架封面
+ * ---------------------------------------------------------------------------
+ * my.qidian.com 个人中心那一族页面（书架 / 消息中心 / 即更即订 / 最近阅读 /
+ * 用户等级 / 财务中心 / 我的票夹 / 我的红包 / 我的书评 / 我的本章说 / 徽章称号 …）
+ * 需要登录才能拿到真实 DOM，没法逐个写选择器，也没有可靠的公共前缀。
+ * 因此改由 content.js 在**夜间运行时**探测并打标记，这里只负责把标记映射成令牌：
+ *   [data-qd-light]  站点写死的「近白且近灰」底色块（#fff / #fafafa / #f7f7fc …）
+ *                    → 换成表面色；弹窗、卡片、表格、选中的侧栏项都在其中
+ *   [data-qd-text]   这些块上的近黑文字（深）→ 主题主文字色
+ *   [data-qd-text2]  这些块上的近黑文字（稍浅，如 #666/#999）→ 主题次级文字色
+ * 判定同时要求低饱和，所以浅红/浅蓝这类彩色底不会被误伤；
+ * 日间模式不标记、不生效，切回日间时 content.js 会清空全部标记。
+ * ===================================================================== */
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-light='1'] {
+  background-color: var(--qd-surface) !important;
+  background-image: none !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-text='1'] {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-text2='1'] {
+  color: var(--qd-text-2) !important;
+}
+
+/* 自适应块里的输入类控件（搜索框、下拉）也跟着夜间走 —— 只改颜色，不动尺寸 */
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-light='1'] input,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-light='1'] select,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-light='1'] textarea {
+  color: var(--qd-text) !important;
+  background-color: var(--qd-surface-2) !important;
+}
+
+/* ---------- 书架封面（content.js 注入，见 COVER_BASE） ----------
+ * 排版要点：封面固定 40×53、统一 10px 右间距，并且永远是书格的第一个子元素
+ * —— 这样每行的封面左边缘成一条竖线，书名起点也整齐。
+ * 用 float 而不是 inline-block：书格内容有时是行内文本（td > em + a），
+ * 有时是块级容器（td > div.book-info > a）。inline-block 遇到块级容器会各占一行，
+ * 封面就被挤到书名上方；float 两种结构都能让文字绕排在封面右侧。 */
+html[data-qd-minimal='on'] .qd-cover-box {
+  float: left;
+  line-height: 0;
+  margin: 1px 10px 0 0;
+  text-decoration: none;
+}
+
+html[data-qd-minimal='on'] .qd-cover {
+  background: var(--qd-surface-3);
+  border: 1px solid var(--qd-border);
+  border-radius: var(--qd-r-md);
+  box-shadow: none;
+  display: block;
+  height: 53px;
+  object-fit: cover;
+  transition: border-color 0.16s var(--qd-ease);
+  width: 40px;
+}
+
+html[data-qd-minimal='on'] .qd-cover-box:hover .qd-cover {
+  border-color: var(--qd-accent-line);
+}
+
+/* 窗口窄到放不下时的退让档：由 verifyCoversFit() 加上（它量的是「书名有没有被压扁」，
+ * 不是写死的断点）。书格不够宽时把封面缩一档，保证书名可读。 */
+html[data-qd-minimal='on'].qd-cover-tight .qd-cover-box {
+  margin-right: 8px;
+}
+
+html[data-qd-minimal='on'].qd-cover-tight .qd-cover {
+  height: 41px;
+  width: 31px;
+}
+
+html[data-qd-minimal='on'].qd-cover-tight .qd-cover-cell .qd-cover-tag {
+  min-width: 0 !important;
+}
+
+/* 书格统一垂直居中 */
+html[data-qd-minimal='on'] .qd-cover-cell {
+  vertical-align: middle !important;
+}
+
+/* 封面让行变高后，站点写死高度的列表容器会装不下、行溢出边框。
+ * content.js 的 relaxRowContainers() 只给「确实装不下」的祖先加这个类，
+ * 把固定高度放开；内滚动容器（overflow:auto/scroll）不会被加。 */
+html[data-qd-minimal='on'] .qd-grow {
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* 封面与书名之间的标签（「玄幻」「轻小说」「诸天无限」…）统一占位宽度，
+ * 这样书名起点也会对齐。宽度不是写死的常数，而是由 content.js 的
+ * syncCoverTagWidth() 量出**当前页面上最长标签的自然宽度**后写进 --qd-tag-w ——
+ * 任何作品、任何长度的标签都能对齐，换站点模板也不用改代码。 */
+html[data-qd-minimal='on'] .qd-cover-cell .qd-cover-tag {
+  display: inline-block !important;
+  min-width: var(--qd-tag-w, 0px) !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+}
+
+/* ========================================================================
+ * 27. 夜间：选中态 / 页脚链接 / 亮色块兜底
+ * ---------------------------------------------------------------------------
+ * · 站点在书架等页面用「浅色高亮」表示选中行，夜间那是一大片亮色 ——
+ *   按要求统一改成暗色选中（表面色 + 左侧强调色竖条），并通过属性选择器
+ *   覆盖常见命名，不依赖具体 class 的全名。
+ * · 页脚那一串「阅文集团旗下平台」链接用的是很浅的灰，夜间对比度不够 → 提亮。
+ * ===================================================================== */
+html[data-qd-minimal='on'][data-qd-resolved='dark'] tr[class*='select' i],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] tr[class*='active' i],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] tr[class*='check' i],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] tr[class*='current' i],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] li[class*='select' i],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] li[class*='active' i],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class*='selected' i],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class*='checked' i] {
+  background-color: var(--qd-surface-3) !important;
+  border-color: var(--qd-border-2) !important;
+  box-shadow: inset 3px 0 0 var(--qd-accent) !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] tr[class*='select' i] *,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] li[class*='select' i] *,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class*='selected' i] * {
+  color: var(--qd-text) !important;
+}
+
+/* 选中行：靠「与兄弟行对比」认出来的（见 content.js 的 markSelectedRows）。
+ * 站点可能把浅色高亮刷在 tr 上，也可能刷在 td 上，所以两处都要按住 ——
+ * td 一律改成透明，让行自己的暗色露出来。 */
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-sel='1'],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-sel='1'] > td,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-sel='1'] > th {
+  background-color: var(--qd-surface-3) !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [data-qd-sel='1'] > td:first-child {
+  box-shadow: inset 3px 0 0 var(--qd-accent) !important;
+}
+
+/* 页脚（各页页脚 class 不一：.footer / .footer-type-1 / .footer-link …） */
+html[data-qd-minimal='on'] [class*='footer'] {
+  color: var(--qd-text-3) !important;
+}
+
+html[data-qd-minimal='on'] [class*='footer'] a,
+html[data-qd-minimal='on'] [class*='footer'] span,
+html[data-qd-minimal='on'] [class*='footer'] p,
+html[data-qd-minimal='on'] [class*='footer'] cite,
+html[data-qd-minimal='on'] [class*='footer'] em {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'] [class*='footer'] a:hover {
+  color: var(--qd-accent) !important;
+}
+
+/* ========================================================================
+ * 28. 全局圆弧边框（强制）
+ * ---------------------------------------------------------------------------
+ * 用户要求：不分模块，凡是「看起来像盒子」的东西一律圆弧边框。
+ * 用属性选择器覆盖常见命名 + 元素名兜底；只改圆角、不动尺寸与位置，
+ * 所以即使误命中也不会破坏布局。
+ * ===================================================================== */
+html[data-qd-minimal='on'] :is(
+  button,
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea,
+  [class*='btn'],
+  [class*='button'],
+  [class*='card'],
+  [class*='panel'],
+  [class*='box'],
+  [class*='wrap'],
+  [class*='item'],
+  [class*='section'],
+  [class*='block'],
+  [class*='tag'],
+  [class*='label'],
+  [class*='badge'],
+  [class*='tab'],
+  [class*='menu'],
+  [class*='dropdown'],
+  [class*='popup'],
+  [class*='modal'],
+  [class*='dialog'],
+  [class*='toast'],
+  [class*='notice'],
+  [class*='alert'],
+  [class*='tooltip'],
+  [class*='banner'],
+  [class*='cover'],
+  [class*='pager'],
+  [class*='page-'],
+  li,
+  dd,
+  dt,
+  figure,
+  figcaption,
+  blockquote,
+  pre,
+  code,
+  img,
+  video,
+  canvas,
+  table,
+  details,
+  summary
+) {
+  border-radius: var(--qd-r-box);
+}
+
+/* 小控件用更小的圆角，避免变成胶囊 */
+html[data-qd-minimal='on'] :is(
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  [class*='tag'],
+  [class*='label'],
+  [class*='badge'],
+  [class*='btn']
+) {
+  border-radius: var(--qd-r-sm);
+}
+
+/* 本来就是圆形的元素（头像、圆点）不能被改成圆角矩形 */
+html[data-qd-minimal='on'] :is([class*='circle'], [class*='round'], [class*='dot']) {
+  border-radius: var(--qd-r-pill);
+}
+
+/* ========================================================================
+ * 29. 频道页（/xianxia/ 这类）
+ * ---------------------------------------------------------------------------
+ * · 顶部横幅：一块巨大的装饰图 + 中间一个起点 logo，很突兀 —— 由 content.js
+ *   识别后打 data-qd-hidebanner，这里隐藏（不需要知道它的 class）。
+ * · .new-wrap 是频道页的「新书精选」区块，内容会溢出圆角框外，这里收进框里。
+ * ===================================================================== */
+html[data-qd-minimal='on'] [data-qd-hidebanner='1'] {
+  display: none !important;
+}
+
+html[data-qd-minimal='on'] .new-wrap {
+  overflow: hidden !important;
+  border-radius: var(--qd-r-box) !important;
+}
+
+html[data-qd-minimal='on'] .new-wrap ul li,
+html[data-qd-minimal='on'] .new-wrap ul li p,
+html[data-qd-minimal='on'] .new-wrap ul li h2,
+html[data-qd-minimal='on'] .new-wrap ul li h2 a {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+html[data-qd-minimal='on'] .new-wrap ul li h2,
+html[data-qd-minimal='on'] .new-wrap ul li h2 a {
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+html[data-qd-minimal='on'] .new-wrap ul li p {
+  overflow-wrap: anywhere !important;
+  white-space: normal !important;
+}
+
+/* ========================================================================
+ * 30. 书籍详情页首屏（夜间）
+ * ---------------------------------------------------------------------------
+ * 首屏那片浅色底是站点**写死在负层级装饰层**上的（实抓 bd1.css 确认）：
+ *     .book-detail .gradient { background-color:#f7f7fc; z-index:-9 }
+ *     .book-detail-mid       { background-color:#f7f7fc }
+ * 负层级元素靠运行时自适应扫不可靠（层叠层级/扫描时机都可能错过），
+ * 既然是确认过的站点规则，这里直接按住，不再依赖探测。
+ * ===================================================================== */
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-detail .gradient,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-detail-mid,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-detail .bg-left,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-detail .bg-right {
+  background-color: var(--qd-bg) !important;
+  background-image: none !important;
+  filter: none !important;
+}
+
+/* 首屏文字：站点是 #191919 / grey，夜间一律换成主题色 */
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info h1,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .author-name,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .author-name .writer,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .book-attribute,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .book-meta .author,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-information-normal,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-information-publish {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .dot,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .book-meta,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .book-update-time,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .update-time-comic,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .intro,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .latest-chapter,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-info .book-latest-chapter {
+  color: var(--qd-text-2) !important;
+}
+
+/* 首屏封面与作者卡：夜间阴影加重，避免"贴"在深底上 */
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-detail-img {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-detail-mid .book-info-outer {
+  color: var(--qd-text) !important;
+}
+
+/* ========================================================================
+ * 31. 详情页右栏卡片 + 「选中态」的精确词匹配（夜间）
+ * ---------------------------------------------------------------------------
+ * 实抓 bd1.css 确认，右栏这一组卡片是同一个选择器：
+ *     .book-copyright, .honor-works, .ip-image, .other-works, .rec-works
+ *         { background-color:#fff; border-radius:10px; width:276px }
+ * 它们是整块白卡，夜间必须压暗（自适应扫描覆盖不到这页的全部区块）。
+ *
+ * 选中态：站点的类名是 .act（左栏「作品信息/互动投票/目录」的选中项）。
+ * 之前只写了 select/active/checked…，而 .act 不含 "active" 子串 → 漏掉。
+ * 这里改用 CSS 的 ~= 精确词匹配，把常见「选中」词汇一次覆盖全。
+ * ===================================================================== */
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .honor-works,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .ip-image,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .other-works,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .rec-works,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .booklist_container {
+  background-color: var(--qd-surface) !important;
+  border: 1px solid var(--qd-border) !important;
+  box-shadow: none !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .work-title,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .honor-works .work-title,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .ip-image .work-title,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .other-works .work-title,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .rec-works .work-title,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .work-title h3,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .honor-works .work-title h3,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .book-wrap-new .text h4 a,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .honor-works .book-wrap-new .text h4 a,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .copyright-txt {
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .work-title a,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .honor-works .work-title a,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .book-desc,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .honor-works .book-desc,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .copy-title3 {
+  color: var(--qd-text-2) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .line,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .honor-works .line {
+  background-color: var(--qd-border) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .book-wrap-new:hover,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .honor-works .book-wrap-new:hover {
+  background: var(--qd-surface-2) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] .book-copyright .copyright-li {
+  border-color: var(--qd-border) !important;
+}
+
+/* ---------- 选中态：~= 精确词匹配，一次覆盖各种命名 ---------- */
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='act'],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='on'],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='cur'],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='current'],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='active'],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='selected'],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='checked'],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='chosen'],
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='picked'] {
+  background-color: var(--qd-surface-3) !important;
+  border-color: var(--qd-border-2) !important;
+  color: var(--qd-text) !important;
+}
+
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='act'] *,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='current'] *,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='selected'] *,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='checked'] *,
+html[data-qd-minimal='on'][data-qd-resolved='dark'] [class~='chosen'] * {
+  color: var(--qd-text) !important;
+}

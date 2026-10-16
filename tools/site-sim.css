@@ -1,0 +1,538 @@
+/*!
+ * 站点样式模拟 · tools/site-sim.css
+ * ---------------------------------------------------------------------------
+ * 摘自 2026-10 实抓的 https://qdfepccdn.qidian.com/www.qidian.com/css/views/
+ * www.qidian.com/index/index.*.css（站点主样式表，189KB）中与预览/断言相关的部分。
+ *
+ * 用途：test/preview.html 与 tools/audit.html 只加载 theme.css，若没有这份模拟，
+ * 页面就没有真实的浮动布局与配色，也就无法验证「覆盖能不能赢」「有没有改坏布局」。
+ *
+ * 加载顺序：site-sim.css 在前（相当于站点自己的 CSS），theme.css 在后（相当于我们
+ * 在 document_end 注入的样式），与线上真实顺序一致。
+ *
+ * 注意：这里只抄了必要的部分，不是站点样式的完整副本。
+ */
+
+.box-center { margin-left: auto; margin-right: auto; width: 1200px }
+.cf:after { clear: both; content: ''; display: table }
+.fl { float: left }
+.fr { float: right }
+
+/* ---------- 顶部工具条 ---------- */
+.top-nav { height: 35px }
+.top-nav,
+.top-nav .box-center { background: #f7f7f7; border-bottom: 1px solid #e5e5e5 }
+.top-nav a { color: gray; float: left; font: 12px/35px Simsun; height: 35px; overflow: hidden }
+.top-nav em { color: #d9d9d9; float: left; font: 12px/35px Arial; margin: 0 10px }
+.submit-input { clip: rect(0 0 0 0); position: absolute }
+.iconfont { font-style: normal }
+.top-nav a.act {
+  background: #fff;
+  border-left: 1px solid #e5e5e5;
+  border-right: 1px solid #e5e5e5;
+  color: #575757;
+  height: 36px;
+  margin-bottom: -1px;
+  margin-right: 10px;
+  max-width: 80px;
+  position: relative;
+  text-align: center;
+  width: 80px;
+}
+
+/* ---------- 顶部随机广告（页游入口） ---------- */
+.top-op-box { height: 60px }
+.top-game-op { display: none; height: 60px; overflow: hidden; position: relative; z-index: 1 }
+.top-game-op img { display: block; height: 60px; width: 1200px }
+
+/* ---------- 品牌行 + 搜索 ---------- */
+/* 注意：真实页面上这一行同时带 .box-center，而站点 CSS 里 .box-center{width:1200px}
+   排在 .logo-wrap{width:100%} 之后 → 这一行实际只有 1200px 宽。
+   这正是「加了背景色后左右两侧露出页面底色」的根因，所以模拟里必须写死 1200px。 */
+.logo-wrap {
+  height: 84px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+  width: 1200px;
+}
+.logo-wrap .box-center { position: relative }
+.logo-wrap .logo { height: 55px; margin: 14px 182px 0 0; width: 218px }
+.logo-wrap .logo a {
+  background: #c8102e;
+  border-radius: 4px;
+  color: #fff;
+  display: block;
+  font: 700 20px/55px Simsun;
+  height: 100%;
+  text-align: center;
+  width: 100%;
+}
+.logo-wrap .search-wrap { margin-top: 22px }
+.logo-wrap .search-wrap p {
+  border: 1px solid #dbdbdb;
+  border-right: none;
+  float: left;
+  height: 38px;
+  overflow: hidden;
+  width: 348px;
+}
+.logo-wrap .search-wrap .search-box {
+  border: 0;
+  float: left;
+  font: 14px/38px Simsun;
+  height: 38px;
+  padding: 0 11px;
+  width: 326px;
+}
+.logo-wrap .search-wrap .search-btn {
+  background-color: #bf2c24;
+  float: left;
+  height: 40px;
+  text-align: center;
+  width: 40px;
+}
+.logo-wrap .search-wrap .search-btn em { color: #fff; display: block; font-size: 18px; margin-top: 10px }
+.logo-wrap .book-shelf { background: #fff; height: 40px; overflow: hidden; width: 120px }
+.logo-wrap .book-shelf a {
+  border: 1px solid #e6e6e6;
+  color: #1a1a1a;
+  display: block;
+  font: 14px/38px Simsun;
+  height: 38px;
+  text-align: center;
+  width: 118px;
+}
+
+/* ---------- 主导航 ---------- */
+.main-nav-wrap,
+.main-nav-wrap .main-nav { background-color: #3e3d43; position: relative }
+.main-nav-wrap .main-nav { height: 40px }
+.main-nav-wrap .main-nav ul { list-style: none; margin: 0; padding: 0 }
+.main-nav-wrap .main-nav li { float: left }
+.main-nav-wrap .main-nav li a {
+  border-bottom: 2px solid #333;
+  color: #fff;
+  float: left;
+  font: 16px/38px Simsun;
+  height: 38px;
+  padding: 0 32px;
+}
+.main-nav-wrap .main-nav li.nav-li a.act { background-color: #ed4259; border-bottom: 2px solid #ed4259; color: #fff }
+.main-nav-wrap .main-nav li.first {
+  background-color: #313035;
+  cursor: pointer;
+  height: 40px;
+  margin-right: 30px;
+  position: relative;
+  width: 216px;
+}
+.main-nav-wrap .main-nav li.first span {
+  background-color: #313035;
+  color: #fff;
+  display: block;
+  font: 16px/38px Simsun;
+  padding: 0 0 0 18px;
+}
+.main-nav-wrap .main-nav li.first span em { float: left; height: 14px; margin: 13px 8px 0 0; width: 16px }
+.main-nav-wrap .main-nav li.first span em i { background: #d5d5d6; display: block; height: 2px; margin-bottom: 4px; width: 16px }
+.main-nav-wrap .main-nav li .game-dropdown {
+  background: #fff;
+  box-shadow: 0 3px 5px #ccc;
+  height: 406px;
+  position: absolute;
+  top: 40px;
+  width: 216px;
+  z-index: 21;
+}
+
+/* ---------- 首页书单三栏 ---------- */
+.index-two-wrap { margin-bottom: 40px }
+.book-list-wrap { width: 216px }
+.book-list-wrap .book-list ul { list-style: none; margin: 0; padding: 0 }
+.book-list-wrap .book-list li { border-top: 1px solid #e6e6e6; height: 31px; overflow: hidden }
+.book-list-wrap .book-list li:first-child { border-top: none }
+.book-list-wrap .book-list li a { float: left; font: 14px/32px Simsun }
+.book-list-wrap .book-list li a.channel { color: gray; height: 32px; min-width: 56px; overflow: hidden }
+.book-list-wrap .book-list li a.name { color: #1a1a1a; max-width: 100px; overflow: hidden; white-space: nowrap }
+.book-list-wrap .book-list li .author {
+  color: #b3b3b3;
+  float: right;
+  font: 12px/32px Simsun;
+  overflow: hidden;
+  text-align: right;
+  width: 64px;
+}
+.book-list-wrap .book-list li.color-type_1 a { color: #bf2c24 }
+.book-list-wrap .book-list li .hot { background: #f00; display: inline-block; height: 9px; width: 17px }
+.book-list-wrap .more { color: #3f5a93; font-size: 12px; opacity: 0; transition: 0.2s }
+.book-list-wrap:hover .more { opacity: 1 }
+
+/* ---------- 区块标题 ---------- */
+h3.wrap-title {
+  border-bottom: 1px solid #666;
+  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 400;
+  height: 24px;
+  line-height: 25px;
+  margin: 0;
+  overflow: hidden;
+  padding-bottom: 4px;
+}
+
+/* ---------- 榜单 ---------- */
+.rank-wrap { margin-bottom: 20px }
+.rank-list .book-list ul { list-style: none; margin: 0; padding: 0 }
+.rank-list .book-list li { height: 31px; overflow: hidden }
+.rank-list .book-list li .num-box { float: left; height: 32px; width: 28px }
+.rank-list .book-list li .num-box span {
+  background: #ededed;
+  color: #666;
+  display: block;
+  font: 700 14px/16px Arial;
+  height: 16px;
+  margin-top: 8px;
+  overflow: hidden;
+  text-align: center;
+  width: 16px;
+}
+.rank-list .book-list li .num-box span.num1 { background: #bf2c24; color: #fff }
+.rank-list .book-list li .num-box span.num2 { background: #e67225; color: #fff }
+.rank-list .book-list li .num-box span.num3 { background: #e6bf25; color: #fff }
+.rank-list .book-list li .name-box { border-top: 1px solid #e6e6e6; float: left; height: 30px; position: relative }
+.rank-list .book-list li .name-box a.name { color: #1a1a1a; float: left; font: 14px/31px Simsun; width: 116px }
+.rank-list .book-list li .name-box i.total {
+  color: #b3b3b3;
+  float: right;
+  font: 12px/32px Simsun;
+  overflow: hidden;
+  text-align: right;
+  width: 72px;
+}
+
+/* ---------- 筛选搜索条 ---------- */
+.filter-search-wrap { background: #f2f2f2; height: 80px }
+.filter-search-wrap .box-center { background: #f2f2f2 }
+.filter-search-wrap .filter-search-box { height: 80px; overflow: hidden; width: 926px }
+.filter-search-wrap .filter-search-box .title {
+  color: #1a1a1a;
+  float: left;
+  font: 14px/80px Simsun;
+  height: 80px;
+  margin-right: 24px;
+  overflow: hidden;
+  padding-left: 48px;
+  width: 126px;
+}
+.filter-search-wrap .filter-search-box .filter-search {
+  border-right: 1px solid #d9d9d9;
+  float: left;
+  height: 34px;
+  margin: 23px 35px 0 0;
+  width: 692px;
+}
+.filter-search-wrap .filter-search-box .filter-search .red-btn {
+  background: #bf2c24;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  float: left;
+  font: 14px/34px Simsun;
+  height: 34px;
+  text-align: center;
+  width: 100px;
+}
+.filter-search-wrap .everyone { float: left; height: 40px; margin-top: 20px; overflow: hidden; width: 220px }
+.filter-search-wrap .everyone .title {
+  color: #a6a6a6;
+  float: left;
+  font: 12px/37px Simsun;
+  height: 32px;
+  margin-right: 16px;
+  width: 60px;
+}
+.filter-search-wrap .everyone .key-words { float: left; height: 40px; overflow: hidden; width: 143px }
+.filter-search-wrap .everyone .key-words a { color: #666; display: block; font: 12px/20px Simsun }
+
+/* ---------- 页脚 ---------- */
+.footer { text-align: center }
+.footer,
+.footer .box-center { background: #fafafa }
+.footer .footer-menu { padding: 12px 0 4px }
+.footer .footer-menu a { color: #666; font: 12px/27px Simsun; margin-right: 16px }
+.footer .copy-right { padding-bottom: 16px }
+.footer .copy-right p,
+.footer .copy-right p a { color: #a6a6a6; font: 12px/20px Simsun }
+
+/* ---------- 右下固定条 ---------- */
+.page-bottom-fixed {
+  bottom: 64px;
+  position: fixed;
+  right: 0;
+  text-align: right;
+  width: 64px;
+  z-index: 101;
+}
+.page-bottom-fixed .page-bottom-item {
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  display: block;
+  height: 64px;
+  margin-top: 10px;
+  width: 64px;
+}
+.page-bottom-fixed .page-bottom-item .item-link-txt { display: block; position: relative }
+.page-bottom-fixed .page-bottom-item .item-link-txt em { display: block; height: 24px; margin: 10px 20px 0; width: 24px }
+.page-bottom-fixed .page-bottom-item .txt {
+  color: grey;
+  display: block;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+}
+
+/* ---------- 广告位 / 表格 ---------- */
+.banner-wrap { height: 100px; overflow: hidden; position: relative; z-index: 1 }
+.banner-wrap img { display: block; height: 100px; width: 1200px }
+.hidden { display: none }
+table { border-collapse: separate; border-spacing: 0 }
+td,
+th { border: 1px solid #ddd; padding: 8px }
+
+/* ---------- 写死浅色底的组件（夜间白块的主要来源） ---------- */
+.classify-list { float: left }
+.classify-list dd { background: #f7f6f2; list-style: none; margin: 0; padding: 4px 8px }
+.classify-list dd.even { background: #fcfcfa }
+.classify-list dd .info { color: #1a1a1a }
+.lbf-combobox-panel { background: #fff; border: 1px solid #ddd }
+.lbf-combobox-panel .lbf-combobox-item { background: transparent; color: #1a1a1a; padding: 6px 10px }
+.grey-btn { background: #fbfbfb; border: 1px solid #e6e6e6; color: #666; padding: 6px 12px }
+.popup-wrap,
+.popup-title { background: #fff }
+.all-search { background: #f7f7f7 }
+
+/* ---------- 带封面的书卡 / 限时免费 / 编辑推荐（真实规则） ---------- */
+.book-wrap { padding: 15px 0 }
+.book-wrap::after { clear: both; content: ''; display: table }
+.book-wrap .book-info { float: left; width: 132px }
+.book-wrap .book-info h2 { color: #1a1a1a; font: 16px/24px Simsun; height: 24px; margin: 0; overflow: hidden }
+.book-wrap .book-info p.author { color: #a6a6a6; font-size: 12px; height: 16px; margin: 0 }
+.book-wrap .book-info .desc { color: #666; font-size: 12px; height: 16px; overflow: hidden }
+.book-wrap .book-info p.digital { color: #bf2c24; font-size: 12px; height: 24px; margin: 0 }
+.book-wrap .book-info .tag { border: 1px solid #df9591; color: #bf2c24; display: block; font-size: 12px; height: 18px; line-height: 18px; width: 50px }
+.book-wrap .book-cover { float: right; height: 91px; margin-right: 8px; width: 52px }
+.book-wrap .book-cover img { height: 87px; width: 60px }
+.time-limit-wrap { height: 222px }
+.time-limit-wrap ul { list-style: none; margin: 0; padding: 0 }
+.time-limit-wrap li { float: left; height: 220px; text-align: center; width: 169px }
+.time-limit-wrap li.time-box { width: 172px }
+.time-limit-wrap li.odd { background: #f7f6f2; border: 1px solid #f7f6f2 }
+.time-limit-wrap li.even { background: #fcfcfa; border: 1px solid #fcfcfa }
+.time-limit-wrap li:hover { box-shadow: 0 5px 16px #d9d4c7 }
+.time-limit-wrap li .name { color: #1a1a1a; display: block; font: 16px/21px Simsun; height: 21px; overflow: hidden }
+.time-limit-wrap li .free-blue-btn { background: #3f5a93; color: #fff; display: block; height: 29px; line-height: 29px; margin: 0 auto; width: 88px }
+.edit-rec-wrap .edit-rec-list { list-style: none; margin: 0; padding: 27px 0 28px }
+.edit-rec-wrap .edit-rec-list li { float: left; margin-left: 30px; width: 216px }
+.edit-rec-wrap .edit-rec-list li h3 { height: 20px; margin: 0; overflow: hidden }
+.edit-rec-wrap .edit-rec-list li h3 a { color: #1a1a1a; font: 16px/20px Simsun }
+.edit-rec-wrap .edit-rec-list li p { color: #666; font-size: 12px; height: 36px; line-height: 20px; margin: 0; overflow: hidden }
+
+/* ---------- 全部作品页（/all/）真实规则 ---------- */
+/* 这条不能少：右栏的宽度决定了 477px 两列能不能排在左栏旁边 */
+.all-pro-wrap { padding: 20px 0 0 }
+.main-content-wrap { width: 954px }
+@media (max-width: 1280px) {
+  .main-content-wrap { width: 744px }
+}
+.range-sidebar { margin-right: 30px; width: 216px }
+.range-sidebar .site { border-bottom: 1px solid #ebebeb; height: 29px }
+.range-sidebar .site a {
+  color: gray;
+  display: inline-block;
+  float: left;
+  font: 12px/25px Simsun;
+  height: 29px;
+  text-align: center;
+  width: 48px;
+}
+.range-sidebar .site a.act {
+  background: #fff;
+  border-left: 1px solid #e6e6e6;
+  border-right: 1px solid #e6e6e6;
+  border-top: 2px solid #ed4259;
+  color: #ed4259;
+  font-weight: 700;
+  height: 28px;
+}
+.range-sidebar .selected { border-bottom: 1px solid #ebebeb; margin-bottom: 15px; overflow: hidden; padding: 8px 0 }
+.range-sidebar .selected a {
+  background: #ed4259;
+  border: 1px solid #ed4259;
+  color: #fff;
+  float: left;
+  font: 12px/18px Simsun;
+  height: 18px;
+  margin: 0 8px 8px 0;
+  padding: 0 0 0 4px;
+}
+.select-list { display: block; margin-top: 15px }
+.select-list .work-filter { border-bottom: 1px solid #ebebeb; margin-bottom: 15px; padding-bottom: 6px }
+.select-list .work-filter h3 { font: 12px/1 Simsun; margin: 0 0 15px }
+.select-list .work-filter ul { list-style: none; margin: 0; min-height: 27px; overflow: hidden; padding: 0 }
+.select-list .work-filter ul li {
+  float: left;
+  height: 20px;
+  margin: 0 8px 8px 0;
+  padding: 0 4px;
+  position: relative;
+  text-align: center;
+}
+.select-list .work-filter ul li a { color: #333; display: block; font: 12px/20px Simsun }
+.select-list .work-filter ul li.act { background: #333 }
+.select-list .work-filter ul li.act a { color: #fff }
+.select-list .work-filter ul li.arrow cite {
+  border-color: currentcolor transparent #e5e5e5;
+  border-style: none solid solid;
+  border-width: 0 5px 5px;
+  height: 0;
+  left: 50%;
+  margin-left: -5px;
+  position: absolute;
+  top: 21px;
+  width: 0;
+}
+.select-list .sub-type {
+  background: #f7f6f2;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  padding-bottom: 5px;
+}
+.select-list .sub-type dl { margin: 0; padding: 8px 12px 0 }
+.select-list .sub-type dd {
+  float: left;
+  font: 12px/28px Simsun;
+  margin: 0 10px 0 0;
+}
+.select-list .sub-type dd a { color: #666; display: inline-block; text-align: center }
+.select-list .sub-type dd.act a { background: #333; color: #fff; height: 20px; line-height: 20px; min-width: 56px }
+
+.tool-bar { background: #f7f6f2; height: 40px; margin-bottom: 24px; padding: 0 12px; position: relative }
+.tool-bar .select-wrap { position: relative }
+.tool-bar .select-wrap a {
+  color: #a6a6a6;
+  display: inline-block;
+  font: 12px/40px Simsun;
+  height: 40px;
+  position: relative;
+  vertical-align: middle;
+}
+.tool-bar .select-wrap a.act { color: #ed4259; font-weight: 700 }
+.tool-bar .select-wrap > a { margin-left: 10px; margin-right: 10px }
+.tool-bar .select-wrap > a:first-child { margin-left: 0 }
+.tool-bar .count-info { color: #a6a6a6; font: 12px/40px Simsun }
+.tool-bar .count-info span { color: #262626; font: 12px/16px Arial; margin: 0 5px }
+
+.book-img-text .all-img-list { list-style: none; margin: 0; overflow: hidden; padding: 0 }
+.book-img-text li { border-top: 1px solid #e6e6e6; height: 162px; padding-top: 25px }
+.book-img-text li:first-child { border-top: none; padding-top: 0 }
+.book-img-text .all-img-list li:first-child + li { border-top: none; padding-top: 0 }
+.book-img-text .all-img-list li { float: left; width: 477px }
+.book-img-text .all-img-list li .book-mid-info { width: 344px }
+.book-img-text .book-img-box,
+.book-img-text .book-mid-info { float: left }
+.book-img-text .book-img-box { height: 136px; margin-right: 16px; width: 102px }
+.book-img-text .book-img-box a { box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35); display: block; height: 136px; overflow: hidden; width: 102px }
+.book-img-text .book-img-box a img { height: 136px; width: 102px }
+.book-img-text .book-mid-info { margin-top: 5px }
+.book-img-text .book-mid-info h2 { font: 18px/24px Simsun; height: 24px; margin: 0 0 8px; overflow: hidden }
+.book-img-text .book-mid-info h2 a { color: #1a1a1a }
+.book-img-text .book-mid-info p { font-size: 12px; margin: 0 }
+.book-img-text .book-mid-info p.author { height: 16px; margin-bottom: 6px; overflow: hidden }
+.book-img-text .book-mid-info p.author a,
+.book-img-text .book-mid-info p.author span { color: #a6a6a6; float: left; line-height: 16px }
+.book-img-text .book-mid-info p.author i { color: #a6a6a6; float: left; line-height: 16px; margin: 0 3px }
+.book-img-text .book-mid-info p.intro { color: #666; font-size: 14px; height: 48px; line-height: 24px; margin-bottom: 8px; overflow: hidden }
+.book-img-text .book-mid-info p.update { line-height: 22px; white-space: nowrap }
+.book-img-text .book-mid-info p.update a { color: #3f5a93; display: inline-block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.book-img-text .book-mid-info cite.red-kw { color: #bf2c24 }
+
+/* ---------- 底部分页 / 本周热推（真实规则） ---------- */
+.page-box { min-height: 25px; padding: 40px 0 }
+.page-box .pagination { overflow: hidden }
+.page-box .pagination ul { float: left; list-style: none; margin: 0; padding: 0 }
+.page-box .pagination li { float: left; margin-right: 10px; text-align: center }
+.page-box .pagination li a { border: 1px solid #fff; float: left; font: 14px/22px Arial; height: 22px; padding: 0 7px }
+.page-box .pagination .lbf-pagination-current { background: #ed4259; border: 1px solid #ed4259; color: #fff }
+.page-box .pagination .lbf-pagination-disabled { color: #ccc }
+.page-box .pagination .lbf-pagination-jump { float: left }
+.page-box .pagination .lbf-pagination-jump input {
+  border: 1px solid #f2f2f2; display: inline-block; font: 12px/22px Arial;
+  height: 22px; margin-right: 10px; text-align: center; width: 40px;
+}
+.page-box .pagination .lbf-pagination-jump .lbf-pagination-go {
+  border: 1px solid #f2f2f2; display: inline-block; font: 12px/22px Simsun;
+  height: 22px; text-align: center; width: 34px;
+}
+.weekly-hot-rec { font-size: 0 }
+.weekly-hot-rec .title { color: #666; float: left; font-size: 13px; width: 65px }
+.weekly-hot-rec .book-name-container { margin-left: 65px }
+.weekly-hot-rec .book-name-container .book-item {
+  color: #000; display: inline-block; font-size: 13px; margin-bottom: 16px; margin-right: 20px;
+}
+
+/* ---------- 书籍详情页首屏：浅色玻璃拟态 + 负层级装饰层（真实规则） ---------- */
+.book-detail { position: relative }
+.book-detail .gradient { background-color: #f7f7fc; bottom: 0; left: 0; position: absolute; right: 0; top: 0; z-index: -9 }
+.book-detail .bg-left,
+.book-detail .bg-right { border-radius: 50%; filter: blur(100px); position: absolute; z-index: -10 }
+.book-detail-mid { background-color: #f7f7fc; padding-top: 32px }
+.book-author {
+  border-radius: 10px; box-shadow: 0 4px 24px rgba(107, 100, 147, 0.16); box-sizing: border-box;
+  display: flex; min-height: 80px; padding: 32px 0 32px 32px; position: relative; width: 1084px;
+}
+.book-author:before {
+  background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.36), hsla(0, 0%, 100%, 0));
+  border-radius: inherit; bottom: 0; content: ''; left: 0; position: absolute; right: 0; top: 0; z-index: -1;
+}
+.book-detail-img { border-radius: 4px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16); height: 240px; overflow: hidden; width: 180px }
+.nav-wrap {
+  align-items: center; border-bottom: 1px solid rgba(0, 0, 0, 0.04); box-sizing: border-box;
+  display: flex; font-size: 14px; height: 68px; justify-content: space-between; line-height: 22px;
+  min-width: 1164px; text-align: center; white-space: nowrap; z-index: 200;
+}
+.nav-wrap .left-items { display: flex; gap: 18px; padding-left: 24px }
+.nav-wrap .right-items { display: flex; gap: 14px; padding-right: 24px }
+
+/* ---------- 首页排行榜（真实规则：榜首是整卡，其余是单行） ---------- */
+.rank-list-row { height: 423px; overflow: hidden; width: 101% }
+.rank-list-row > .rank-list { float: left; width: 19.6% }
+.rank-list .book-list ul { list-style: none; margin: 0; padding: 0 }
+.rank-list .book-list li { clear: both; height: 31px }
+.rank-list .book-list li.unfold { height: 114px; margin-bottom: -1px }
+.rank-list .book-list li .num-box { float: left; height: 32px; width: 28px }
+.rank-list .book-list li .num-box span {
+  background: #ededed; color: #666; display: block; font: 700 14px/16px Arial;
+  height: 16px; margin-top: 8px; overflow: hidden; text-align: center; width: 16px;
+}
+.rank-list .book-list li .num-box span.num1 { background: #bf2c24; color: #fff }
+.rank-list .book-list li .num-box span.num2 { background: #e67225; color: #fff }
+.rank-list .book-list li .num-box span.num3 { background: #e6bf25; color: #fff }
+.rank-list .book-list li .name-box { border-top: 1px solid #e6e6e6; float: left; height: 30px; position: relative }
+.rank-list .book-list li .name-box a { float: left; font: 14px/31px Simsun; width: 116px }
+.rank-list .book-list li .name-box a h2,
+.rank-list .book-list li .name-box a.name {
+  color: #1a1a1a; height: 31px; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rank-list .book-list li .name-box i.total {
+  color: #b3b3b3; float: right; font: 12px/32px Simsun; overflow: hidden; text-align: right; width: 72px;
+}
+.book-wrap .book-info h3 {
+  background: #bf2c24; color: #fff; font: 700 14px/18px Arial; height: 18px;
+  margin: 0 0 3px; text-align: center; width: 36px;
+}

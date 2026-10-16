@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>起点极简</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="hd">
+      <div class="mark" aria-hidden="true">
+        <span class="sq"></span>
+        <span class="ci"></span>
+      </div>
+      <div class="hd-txt">
+        <h1>起点极简</h1>
+        <p>现代几何极简 · 不改阅读页</p>
+      </div>
+      <span class="ver" id="ver">v1.10.0</span>
+    </header>
+
+    <div class="status" id="status">
+      <span class="dot" id="dot"></span>
+      <span id="statusText">正在检测当前页面…</span>
+    </div>
+
+    <section class="card">
+      <label class="row" for="enabled">
+        <span class="row-txt">
+          <b>启用极简界面</b>
+          <i>关闭后整站恢复起点原样</i>
+        </span>
+        <input type="checkbox" id="enabled" class="sw" />
+        <span class="sw-ui" aria-hidden="true"></span>
+      </label>
+    </section>
+
+    <section class="card">
+      <div class="card-title">配色主题</div>
+      <div class="seg" role="radiogroup" aria-label="配色主题">
+        <button type="button" class="seg-btn" data-theme="light" role="radio">
+          <span class="seg-ico sun"></span>日间
+        </button>
+        <button type="button" class="seg-btn" data-theme="dark" role="radio">
+          <span class="seg-ico moon"></span>夜间
+        </button>
+        <button type="button" class="seg-btn" data-theme="auto" role="radio">
+          <span class="seg-ico auto"></span>跟随系统
+        </button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">界面清理</div>
+
+      <label class="row" for="removeGames">
+        <span class="row-txt"><b>移除页游入口</b><i>隐藏页游 / 游戏中心按钮</i></span>
+        <input type="checkbox" id="removeGames" class="sw" />
+        <span class="sw-ui" aria-hidden="true"></span>
+      </label>
+
+      <label class="row" for="hideAds">
+        <span class="row-txt"><b>隐藏推广位</b><i>广告位与第三方投放</i></span>
+        <input type="checkbox" id="hideAds" class="sw" />
+        <span class="sw-ui" aria-hidden="true"></span>
+      </label>
+
+      <label class="row" for="showToggle">
+        <span class="row-txt"><b>悬浮日夜按钮</b><i>页面右下角常驻切换键</i></span>
+        <input type="checkbox" id="showToggle" class="sw" />
+        <span class="sw-ui" aria-hidden="true"></span>
+      </label>
+    </section>
+
+    <section class="card">
+      <div class="card-title">排障与扩展</div>
+      <div class="row pad">
+        <button type="button" class="btn ghost" id="export">导出当前页结构</button>
+      </div>
+      <textarea id="outline" class="outline-box" hidden readonly spellcheck="false"></textarea>
+      <p class="hint" id="exportHint">
+        导出的是页面 DOM 轮廓（标签 / class / id），用于给这个页面补齐选择器。
+      </p>
+    </section>
+
+    <footer class="ft">
+      <button type="button" class="btn ghost" id="reload">刷新当前页</button>
+      <button type="button" class="btn" id="reset">恢复默认</button>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-qd-minimal="on" data-qd-theme="dark" data-qd-nogames="on" data-qd-noads="on">
+  <head>
+    <meta charset="UTF-8" />
+    <title>起点极简 · 阅读页守卫自检</title>
+    <link rel="stylesheet" href="../../src/theme.css" />
+    <!-- 模拟 early.js 已经在阅读页留下了痕迹，content.js 必须全部抹掉 -->
+    <link id="qd-minimal-css" rel="stylesheet" href="../../src/theme.css" />
+    <style>
+      /* 阅读页自己的排版，必须原封不动 */
+      #reader-body {
+        max-width: 760px;
+        margin: 0 auto;
+        font-size: 20px;
+        line-height: 2;
+        color: rgb(17, 17, 17);
+        background: rgb(250, 249, 245);
+      }
+    </style>
+  </head>
+  <body style="background: rgb(250, 249, 245)">
+    <div class="reader-wrap">
+      <h1 id="chapter-title" style="font-size: 26px; font-weight: 400">第一章 山村少年</h1>
+      <div id="reader-body">
+        <p>一个普通山村小子，偶然下进入到当地江湖小门派，成了一名记名弟子。</p>
+        <p>他以这样的身份，如何在修仙界中生存？</p>
+      </div>
+    </div>
+
+    <!-- 阅读页里也可能出现同名的书单结构，同样不能被改动 -->
+    <ul class="book-list">
+      <li><div class="book-mid-info"><h3><a href="#">下一章</a></h3></div></li>
+    </ul>
+
+    <!-- 阅读页里的「页游」入口：守卫生效时不应该被删（整页不注入） -->
+    <div class="game-entry" id="reader-game-entry">页游</div>
+    <div class="top-op-box" id="j-topOpBox">
+      <div class="top-game-op" id="topGameOp" style="display: block"><div class="game-wrap"><a href="https://game.qidian.com/x">页游</a></div></div>
+    </div>
+    <ul class="main-nav"><li class="game web" id="game-web"><a class="web-game" href="https://game.qidian.com?x">页游</a></li></ul>
+
+    <pre id="report">RUNNING</pre>
+
+    <script>
+      (function () {
+        var store = {
+          enabled: true,
+          theme: 'dark',
+          removeGames: true,
+          hideAds: false,
+          showToggle: true
+        };
+        window.__qdStore = store;
+        window.chrome = {
+          storage: {
+            sync: {
+              get: function (keys, cb) {
+                var out = {};
+                (Array.isArray(keys) ? keys : Object.keys(keys || store)).forEach(function (k) {
+                  if (k in store) out[k] = store[k];
+                });
+                setTimeout(function () {
+                  cb(out);
+                }, 0);
+              },
+              set: function (obj, cb) {
+                Object.assign(store, obj);
+                setTimeout(function () {
+                  if (cb) cb();
+                }, 0);
+              }
+            },
+            onChanged: { addListener: function () {} }
+          },
+          runtime: {
+            getURL: function (p) {
+              return '../../' + p;
+            },
+            onMessage: {
+              addListener: function (fn) {
+                window.__qdMsg = fn;
+              }
+            }
+          }
+        };
+        var s = document.createElement('script');
+        s.src = '../../src/content.js';
+        document.head.appendChild(s);
+      })();
+
+      var out = [];
+      var pass = 0;
+      var fail = 0;
+      function ck(name, actual, expected) {
+        var ok = Array.isArray(expected) ? expected.indexOf(actual) !== -1 : actual === expected;
+        if (ok) {
+          pass++;
+          out.push('CT PASS | ' + name + ' | ' + actual);
+        } else {
+          fail++;
+          out.push('CT FAIL | ' + name + ' | ' + actual + ' | 期望 ' + expected);
+        }
+      }
+
+      setTimeout(function () {
+        try {
+        var root = document.documentElement;
+
+        ck('URL 确实落在 /chapter/ 路径下', /\/chapter\//.test(location.pathname), true);
+        ck('抹掉了极简标记', root.hasAttribute('data-qd-minimal'), false);
+        ck('抹掉了主题标记', root.hasAttribute('data-qd-theme'), false);
+        ck('抹掉了推广位标记', root.hasAttribute('data-qd-noads'), false);
+        ck('移除了注入的样式表', !!document.getElementById('qd-minimal-css'), false);
+        ck('没有挂载悬浮按钮', !!document.getElementById('qd-minimal-toggle'), false);
+        ck('没有任何节点被打上隐藏标记', document.querySelectorAll('[data-qd-hidden]').length, 0);
+
+        // 阅读页排版必须原样
+        var rb = document.getElementById('reader-body');
+        var cs = getComputedStyle(rb);
+        ck('阅读正文最大宽度未被改动', cs.maxWidth, '760px');
+        ck('阅读正文字号未被改动', cs.fontSize, '20px');
+        ck('阅读正文行高未被改动', cs.lineHeight, '40px');
+        ck('阅读正文颜色未被改动', cs.color, 'rgb(17, 17, 17)');
+        ck('阅读页底色未被改动', getComputedStyle(document.body).backgroundColor, 'rgb(250, 249, 245)');
+        ck('章节标题字号未被改动', getComputedStyle(document.getElementById('chapter-title')).fontSize, '26px');
+
+        // 阅读页里的「页游」入口也不应该被动
+        ck('阅读页内容未被清理逻辑触碰', document.getElementById('reader-game-entry').hasAttribute('data-qd-hidden'), false);
+        ck('阅读页的顶部广告条未被隐藏', document.getElementById('j-topOpBox').hasAttribute('data-qd-hidden'), false);
+        ck('阅读页的顶部广告条 display 未被改动',
+          getComputedStyle(document.getElementById('topGameOp')).display, 'block');
+        ck('阅读页的页游导航项未被隐藏', document.getElementById('game-web').hasAttribute('data-qd-hidden'), false);
+        } catch (e) {
+          fail++;
+          out.push('CT FAIL | 断言过程抛错 | ' + (e && e.message));
+        }
+
+        out.push('CT SUMMARY | pass=' + pass + ' fail=' + fail);
+        document.getElementById('report').textContent = '\n' + out.join('\n');
+        document.title = 'CT pass=' + pass + ' fail=' + fail;
+      }, 260);
+    </script>
+  </body>
+</html>
